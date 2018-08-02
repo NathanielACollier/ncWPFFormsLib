@@ -67,4 +67,8 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>del "$(TargetDir)*.nupkg"
+nuget.exe pack $(ProjectPath) -Verbosity detailed -IncludeReferencedProjects -Symbols -Prop Configuration=$(ConfigurationName) -Prop Platform=$(Platform)</PostBuildEvent>
+  </PropertyGroup>
 </Project>

@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageVersion>2.0.1</PackageVersion>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="DotNetProjects.WpfToolkit.Input" Version="6.0.90" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\nac.wpf.controls.BusyControl\nac.wpf.controls.BusyControl.csproj" />
+  </ItemGroup>
+</Project>

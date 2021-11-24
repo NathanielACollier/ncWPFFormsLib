@@ -110,7 +110,7 @@ namespace nac.wpf.forms
             tb.FilterMode = AutoCompleteFilterMode.None; // we are going to filter inside the function
             SetupTimerForAutoComplete(this.Model, fieldName, tb, itemsGenerator);
 
-            var busyIndicator = new ncWPFBusyControlLib.BusyIndicatorControl();
+            var busyIndicator = new nac.wpf.controls.BusyControl.BusyIndicatorControl();
             busyIndicator.Width = 20;
             busyIndicator.Height = 20;
             busyIndicator.Visibility = Visibility.Collapsed; // start out hidden
@@ -133,7 +133,7 @@ namespace nac.wpf.forms
             busyBind.Source = this.Model;
             busyBind.Path = new PropertyPath(busyFieldName);
             busyBind.Mode = BindingMode.TwoWay;
-            BindingOperations.SetBinding(busyIndicator, ncWPFBusyControlLib.BusyIndicatorControl.BusyProperty, busyBind);
+            BindingOperations.SetBinding(busyIndicator, nac.wpf.controls.BusyControl.BusyIndicatorControl.BusyProperty, busyBind);
 
             DockPanel halfRow = new DockPanel();
             DockPanel.SetDock(busyIndicator, Dock.Left);

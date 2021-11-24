@@ -6,6 +6,9 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
   
+  <ItemGroup>
+    <PackageReference Include="DotNetProjects.WpfToolkit.Input" Version="6.0.90" />
+  </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\nac.wpf.controls.BusyControl\nac.wpf.controls.BusyControl.csproj" />

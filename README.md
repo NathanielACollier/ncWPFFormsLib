@@ -2,7 +2,7 @@
 
 + Library to build WPF GUI apps quickly
 
-+ nuget package [`nac.wpf.forms`](https://nuget.org/)
++ nuget package [`nac.wpf.forms`](https://www.nuget.org/packages/nac.wpf.forms)
 
 ## Examples
 

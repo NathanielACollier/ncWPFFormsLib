@@ -11,7 +11,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace ncWPFFormsLib
+namespace nac.wpf.forms
 {
     public class Form
     {

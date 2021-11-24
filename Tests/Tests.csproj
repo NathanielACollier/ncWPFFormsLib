@@ -29,6 +29,6 @@
     <Reference Include="PresentationCore" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ncWPFFormsLib\ncWPFFormsLib.csproj" />
+    <ProjectReference Include="..\nac.wpf.forms\nac.wpf.forms.csproj" />
   </ItemGroup>
 </Project>

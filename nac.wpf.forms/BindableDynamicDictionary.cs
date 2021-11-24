@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ncWPFFormsLib
+namespace nac.wpf.forms
 {
     /// <summary>
     /// Bindable dynamic dictionary.

@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace ncWPFBusyControlLib
+namespace nac.wpf.controls.BusyControl
 {
 
     public enum BusyMode

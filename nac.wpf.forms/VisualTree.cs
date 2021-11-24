@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
-namespace ncWPFFormsLib
+namespace nac.wpf.forms
 {
     public static class VisualTree
     {

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ncWPFFormsLib", "ncWPFFormsLib\ncWPFFormsLib.csproj", "{D6C1805B-0DE1-4614-9F0F-298BFF030616}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nac.wpf.forms", "nac.wpf.forms\nac.wpf.forms.csproj", "{D6C1805B-0DE1-4614-9F0F-298BFF030616}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{C25F0BB3-F4F3-4C55-BD64-909508E28736}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ncWPFBusyControlLib", "ncWPFBusyControlLib\ncWPFBusyControlLib.csproj", "{163873CF-2B5F-45A8-99EE-9B789CFC515F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nac.wpf.controls.BusyControl", "nac.wpf.controls.BusyControl\nac.wpf.controls.BusyControl.csproj", "{163873CF-2B5F-45A8-99EE-9B789CFC515F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

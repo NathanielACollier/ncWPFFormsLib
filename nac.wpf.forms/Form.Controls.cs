@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
@@ -50,5 +51,99 @@ namespace nac.wpf.forms
             this.AddRowToHost(btn, "");
             return this;
         }
+        
+        
+        public Form PasswordFor(string fieldName)
+        {
+            this.Model[fieldName] = new System.Security.SecureString();
+
+            PasswordBox box = new PasswordBox();
+            // It's impossible to bind to PasswordBox so we have to do it this way
+            //          see: http://stackoverflow.com/questions/1483892/how-to-bind-to-a-passwordbox-in-mvvm
+
+            box.PasswordChanged += (sender, args) =>
+            {
+                this.Model[fieldName] = ((PasswordBox)sender).SecurePassword;
+            };
+
+            this.AddRowToHost(box, fieldName);
+
+            return this;
+        }
+
+
+        public Form DateFor(string fieldName)
+        {
+            this.Model[fieldName] = new DateTime?(); // just init a date in there
+
+            DatePicker dp = new DatePicker();
+            Binding bind = new Binding();
+            bind.Source = this.Model;
+            bind.Path = new PropertyPath(fieldName);
+            bind.Mode = BindingMode.TwoWay;
+            BindingOperations.SetBinding(dp, DatePicker.SelectedDateProperty, bind);
+
+            this.AddRowToHost(dp, fieldName);
+
+            return this;
+        }
+        
+        
+        
+        public Form ButtonsTrueFalseFor(string fieldName)
+        {
+            this.Model[fieldName] = false;
+            var selectedBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
+            var unselectedBrush = (new Button()).Background;
+
+            var sp = new StackPanel();
+            sp.Orientation = Orientation.Horizontal;
+
+            var falseButton = new Button();
+            var trueButton = new Button();
+            // since we start the model out as false, then start the false button out as colored selected
+            falseButton.Background = selectedBrush;
+
+            falseButton.Width = 30;
+            falseButton.Content = "False";
+            falseButton.Click += (s, e) =>
+            {
+                this.Model[fieldName] = false;
+                falseButton.Background = selectedBrush;
+                trueButton.Background = unselectedBrush;
+            };
+
+            trueButton.Width = 30;
+            trueButton.Content = "True";
+            trueButton.Click += (s, e) =>
+            {
+                this.Model[fieldName] = true;
+                trueButton.Background = selectedBrush;
+                falseButton.Background = unselectedBrush;
+            };
+            trueButton.Margin = new Thickness(0, 0, 7, 0);
+
+            sp.Children.Add(trueButton);
+            sp.Children.Add(falseButton);
+
+            AddRowToHost(sp, fieldName);
+
+            return this;
+        }
+
+
+        public Form Text(string text)
+        {
+            var lbl = new Label();
+            lbl.Content = text;
+            AddRowToHost(lbl);
+
+            return this;
+        }
+        
+        
+        
+        
+        
     }
 }

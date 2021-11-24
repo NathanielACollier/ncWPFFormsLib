@@ -46,5 +46,24 @@ namespace nac.wpf.forms
             bind.UpdateSourceTrigger = trigger;
             BindingOperations.SetBinding(control, controlProperty, bind);
         }
+        
+        
+        private static void SetupListViewStyleForMultipleItems(ListView lv)
+        {
+            // style it to stretch list items
+            // see: http://stackoverflow.com/questions/10300228/set-itemcontainerstyle-from-code
+            // see: http://stackoverflow.com/questions/1080479/how-to-make-dockpanel-fill-available-space
+            var lvStyle = new Style(typeof(ListView));
+            var horizontalContentAlignmentSetter = new Setter
+            {
+                Property = ListViewItem.HorizontalContentAlignmentProperty,
+                Value = HorizontalAlignment.Stretch
+            };
+            lvStyle.Setters.Add(horizontalContentAlignmentSetter);
+            lv.Style = lvStyle;
+        }
+        
+        
+        
     }
 }

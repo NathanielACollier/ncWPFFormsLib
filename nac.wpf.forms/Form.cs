@@ -13,7 +13,7 @@ using System.Windows.Markup;
 
 namespace nac.wpf.forms
 {
-    public class Form
+    public partial class Form
     {
 
         public BindableDynamicDictionary Model { get; set; }
@@ -25,99 +25,12 @@ namespace nac.wpf.forms
             this.Host = new StackPanel();
             this.Host.Orientation = Orientation.Vertical;
         }
-
-        #region UI Helpers
-
-        private void AddRowToHost(FrameworkElement ctrl, string rowLabel)
-        {
-            DockPanel row = new DockPanel();
-            Label label = new Label();
-
-            label.Content = rowLabel;
-
-            row.Children.Add(label);
-            row.Children.Add(ctrl);
-
-            DockPanel.SetDock(label, Dock.Left);
-            DockPanel.SetDock(ctrl, Dock.Right);
-
-            this.Host.Children.Add(row);
-        }
-
-        private void AddRowToHost(FrameworkElement ctrl)
-        {
-            DockPanel row = new DockPanel();
-
-            row.Children.Add(ctrl);
-
-            this.Host.Children.Add(row);
-        }
-
-
-
-        private void BindField(string fieldName,
-                        DependencyObject control,
-                        DependencyProperty controlProperty,
-                        BindingMode mode = BindingMode.Default,
-                        UpdateSourceTrigger trigger = UpdateSourceTrigger.Default)
-        {
-            Binding bind = new Binding();
-            bind.Source = this.Model;
-            bind.Path = new PropertyPath(fieldName);
-            bind.Mode = mode;
-            bind.UpdateSourceTrigger = trigger;
-            BindingOperations.SetBinding(control, controlProperty, bind);
-        }
-
-        #endregion
+        
 
 
         #region Chain Functions
 
-        public Form TextBoxFor(string fieldName, string value = "")
-        {
-            this.Model[fieldName] = value;
-
-            TextBox tb = new TextBox();
-            // bind in code: http://stackoverflow.com/questions/7525185/how-to-set-a-binding-in-code
-            Binding bind = new Binding();
-            bind.Source = this.Model;
-            bind.Path = new PropertyPath(fieldName);
-            bind.Mode = BindingMode.TwoWay;
-            bind.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-            BindingOperations.SetBinding(tb, TextBox.TextProperty, bind);
-
-            this.AddRowToHost(tb, fieldName);
-
-            return this;
-        }
-
-        public Form LabelFor(string fieldName, string value = "")
-        {
-            this.Model[fieldName] = value;
-            Label label = new Label();
-
-            Binding bind = new Binding();
-            bind.Source = this.Model;
-            bind.Path = new PropertyPath(fieldName);
-            bind.Mode = BindingMode.TwoWay;
-            bind.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-            BindingOperations.SetBinding(label, Label.ContentProperty, bind);
-
-            this.AddRowToHost(label, fieldName);
-
-            return this;
-        }
-
-
-        public Form ButtonWithLabel(string labelText, RoutedEventHandler onClick)
-        {
-            Button btn = new Button();
-            btn.Content = labelText;
-            btn.Click += onClick;
-            this.AddRowToHost(btn, "");
-            return this;
-        }
+        
 
 
         public Form TextBoxMultipleFor(string fieldName)

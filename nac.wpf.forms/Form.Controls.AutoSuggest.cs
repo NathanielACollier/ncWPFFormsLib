@@ -27,7 +27,7 @@ namespace nac.wpf.forms
 
         private void PopulateAutoComplete(AutoCompleteBox tb,
                             Func<string, IEnumerable<string>> itemsGenerator,
-                            BindableDynamicDictionary model,
+                            nac.utilities.BindableDynamicDictionary model,
                             string itemFieldName)
         {
             var source = model[AutoSuggestSourceName(itemFieldName)] as ObservableCollection<string>;
@@ -71,7 +71,7 @@ namespace nac.wpf.forms
         }
 
 
-        private void SetupTimerForAutoComplete(BindableDynamicDictionary model,
+        private void SetupTimerForAutoComplete(nac.utilities.BindableDynamicDictionary model,
                                         string fieldName,
                                         AutoCompleteBox tb,
                                         Func<string, IEnumerable<string>> itemsGenerator)
@@ -102,7 +102,7 @@ namespace nac.wpf.forms
             this.Model[busyFieldName] = false;
 
 
-
+            
 
             var tb = new System.Windows.Controls.AutoCompleteBox();
             tb.IsTextCompletionEnabled = false;
@@ -117,23 +117,11 @@ namespace nac.wpf.forms
 
             // see this: http://www.broculos.net/2014/04/wpf-autocompletebox-autocomplete-text.html#.VxeC5zArJaQ
 
-            Binding textBind = new Binding();
-            textBind.Source = this.Model;
-            textBind.Path = new PropertyPath(fieldName);
-            textBind.Mode = BindingMode.TwoWay;
-            textBind.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-            BindingOperations.SetBinding(tb, AutoCompleteBox.SelectedItemProperty, textBind);
+            Helper_BindField(fieldName, tb, AutoCompleteBox.SelectedItemProperty, BindingMode.TwoWay);
 
-            Binding itemsBind = new Binding();
-            itemsBind.Source = this.Model;
-            itemsBind.Path = new PropertyPath(autoSuggestSourceFieldName);
-            BindingOperations.SetBinding(tb, AutoCompleteBox.ItemsSourceProperty, itemsBind);
+            Helper_BindField(autoSuggestSourceFieldName, tb, AutoCompleteBox.ItemsSourceProperty);
 
-            Binding busyBind = new Binding();
-            busyBind.Source = this.Model;
-            busyBind.Path = new PropertyPath(busyFieldName);
-            busyBind.Mode = BindingMode.TwoWay;
-            BindingOperations.SetBinding(busyIndicator, nac.wpf.controls.BusyControl.BusyIndicatorControl.BusyProperty, busyBind);
+            Helper_BindField(busyFieldName, busyIndicator, nac.wpf.controls.BusyControl.BusyIndicatorControl.BusyProperty, BindingMode.TwoWay);
 
             DockPanel halfRow = new DockPanel();
             DockPanel.SetDock(busyIndicator, Dock.Left);
@@ -141,7 +129,7 @@ namespace nac.wpf.forms
             halfRow.Children.Add(busyIndicator);
             halfRow.Children.Add(tb);
 
-            AddRowToHost(halfRow, fieldName);
+            Helper_AddRowToHost(halfRow, fieldName);
 
             PopulateAutoComplete(tb, itemsGenerator, this.Model, fieldName);
 

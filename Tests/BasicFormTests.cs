@@ -111,7 +111,7 @@ namespace Tests
                             .TextBoxMultipleFor("Groups")
                             .Display();
 
-            var groups = result.Model["Groups"] as ObservableCollection<BindableDynamicDictionary>;
+            var groups = result.Model["Groups"] as ObservableCollection<nac.utilities.BindableDynamicDictionary>;
 
             Assert.IsTrue(groups.Count > 0);
             Assert.IsTrue(!string.IsNullOrWhiteSpace(groups[0]["Text"] as string));
@@ -155,7 +155,7 @@ namespace Tests
                     return groups;
                 }).Display();
 
-            var groupList = result.Model["Groups"] as ObservableCollection<BindableDynamicDictionary>;
+            var groupList = result.Model["Groups"] as ObservableCollection<nac.utilities.BindableDynamicDictionary>;
 
             Assert.IsTrue(groupList.Count > 0);
             Assert.IsTrue(!string.IsNullOrWhiteSpace(groupList[0]["item_Text"] as string));
@@ -167,11 +167,11 @@ namespace Tests
             var result = new Form()
                                 .TreeFor("Test", (parent) =>
                                 {
-                                    List<BindableDynamicDictionary> children = new List<BindableDynamicDictionary>();
+                                    List<nac.utilities.BindableDynamicDictionary> children = new List<nac.utilities.BindableDynamicDictionary>();
 
                                     if (parent == null)
                                     {
-                                        children.Add(new BindableDynamicDictionary(
+                                        children.Add(new nac.utilities.BindableDynamicDictionary(
                                             new Dictionary<string, object>
                                         {
                                             {"Name", "Parent" }
@@ -179,7 +179,7 @@ namespace Tests
                                     }
                                     else
                                     {
-                                        children.Add(new BindableDynamicDictionary(
+                                        children.Add(new nac.utilities.BindableDynamicDictionary(
                                         new Dictionary<string, object>
                                         {
                                             {"Name", "Child" }

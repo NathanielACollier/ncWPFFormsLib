@@ -12,15 +12,10 @@ namespace nac.wpf.forms
             this.Model[fieldName] = value;
 
             TextBox tb = new TextBox();
-            // bind in code: http://stackoverflow.com/questions/7525185/how-to-set-a-binding-in-code
-            Binding bind = new Binding();
-            bind.Source = this.Model;
-            bind.Path = new PropertyPath(fieldName);
-            bind.Mode = BindingMode.TwoWay;
-            bind.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-            BindingOperations.SetBinding(tb, TextBox.TextProperty, bind);
 
-            this.AddRowToHost(tb, fieldName);
+            Helper_BindField(fieldName, tb, TextBox.TextProperty, BindingMode.TwoWay);
+
+            this.Helper_AddRowToHost(tb, fieldName);
 
             return this;
         }
@@ -30,14 +25,9 @@ namespace nac.wpf.forms
             this.Model[fieldName] = value;
             Label label = new Label();
 
-            Binding bind = new Binding();
-            bind.Source = this.Model;
-            bind.Path = new PropertyPath(fieldName);
-            bind.Mode = BindingMode.TwoWay;
-            bind.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-            BindingOperations.SetBinding(label, Label.ContentProperty, bind);
+            Helper_BindField(fieldName, label, Label.ContentProperty, BindingMode.TwoWay);
 
-            this.AddRowToHost(label, fieldName);
+            this.Helper_AddRowToHost(label, fieldName);
 
             return this;
         }
@@ -48,7 +38,7 @@ namespace nac.wpf.forms
             Button btn = new Button();
             btn.Content = labelText;
             btn.Click += onClick;
-            this.AddRowToHost(btn, "");
+            this.Helper_AddRowToHost(btn, "");
             return this;
         }
         
@@ -66,7 +56,7 @@ namespace nac.wpf.forms
                 this.Model[fieldName] = ((PasswordBox)sender).SecurePassword;
             };
 
-            this.AddRowToHost(box, fieldName);
+            this.Helper_AddRowToHost(box, fieldName);
 
             return this;
         }
@@ -77,13 +67,10 @@ namespace nac.wpf.forms
             this.Model[fieldName] = new DateTime?(); // just init a date in there
 
             DatePicker dp = new DatePicker();
-            Binding bind = new Binding();
-            bind.Source = this.Model;
-            bind.Path = new PropertyPath(fieldName);
-            bind.Mode = BindingMode.TwoWay;
-            BindingOperations.SetBinding(dp, DatePicker.SelectedDateProperty, bind);
 
-            this.AddRowToHost(dp, fieldName);
+            Helper_BindField(fieldName, dp, DatePicker.SelectedDateProperty, BindingMode.TwoWay);
+
+            this.Helper_AddRowToHost(dp, fieldName);
 
             return this;
         }
@@ -126,7 +113,7 @@ namespace nac.wpf.forms
             sp.Children.Add(trueButton);
             sp.Children.Add(falseButton);
 
-            AddRowToHost(sp, fieldName);
+            Helper_AddRowToHost(sp, fieldName);
 
             return this;
         }
@@ -136,7 +123,7 @@ namespace nac.wpf.forms
         {
             var lbl = new Label();
             lbl.Content = text;
-            AddRowToHost(lbl);
+            Helper_AddRowToHost(lbl);
 
             return this;
         }

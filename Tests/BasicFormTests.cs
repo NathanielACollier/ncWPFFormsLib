@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using nac.wpf.forms;
 
@@ -11,14 +12,16 @@ namespace Tests
     public class BasicFormTests
     {
         [TestMethod]
-        public void TestTextBox()
+        public async Task TestTextBox()
         {
-            // idea is to target API like this: http://mscodingblog.blogspot.com/2015/02/introducing-powerforms-for-creating.html
-            var result = (new Form())
-                        .TextBoxFor("Field1")
-                        .Display();
-
-            Assert.IsTrue(!string.IsNullOrEmpty(result.Model["Field1"] as string));
+            await lib.utility.ShowForm(f =>
+            {
+                // idea is to target API like this: http://mscodingblog.blogspot.com/2015/02/introducing-powerforms-for-creating.html
+                f.TextBoxFor("Field1");
+            }, model =>
+            {
+                Assert.IsTrue(!string.IsNullOrEmpty(model["Field1"] as string));
+            });
 
         }
 

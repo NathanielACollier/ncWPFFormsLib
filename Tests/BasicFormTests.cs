@@ -421,39 +421,22 @@ namespace Tests
                 .Display();
         }
 
-        [TestMethod]
-        public async Task wpfThreadTest()
-        {
-            await NacWPFUtilities.WindowHelpers.ShowDialogWindowOutsideWPF(async (win) =>
-            {
-                var form = new NacFormsWPFLib.Form();
-                form
-                                .TextBoxFor("val1", "Hello World!")
-                                .LabelFor("textentered", "")
-                                .ButtonWithLabel("Eval", (_o) =>
-                                {
-                                    form.Model["textentered"] = form.Model["val1"];
-                                })
-                                .Display(win);
-            });
-        }
-
 
 
         [TestMethod]
         public void TestBusy()
         {
-            var form = new NacFormsWPFLib.Form();
-            var busyActions = new NacFormsWPFLib.Form.BusyFunctions();
+            var form = new Form();
+            var busyActions = new nac.wpf.forms.Form.BusyFunctions();
 
             form.Busy("Loading..", false, functions: busyActions)
                 .TextBoxFor("output")
-                .ButtonWithLabel("Start", (_o) =>
+                .ButtonWithLabel("Start", (_s,_o) =>
                 {
                     form.Model["output"] = $"Busy is: {busyActions.isBusy()}\nStarting...";
                     busyActions.start();
                 })
-                .ButtonWithLabel("Stop", (_o) =>
+                .ButtonWithLabel("Stop", (_s, _o) =>
                 {
                     form.Model["output"] = $"Busy is: {busyActions.isBusy()}\nStopping...";
                     busyActions.stop();

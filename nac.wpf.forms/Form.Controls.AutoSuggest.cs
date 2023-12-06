@@ -93,7 +93,8 @@ namespace nac.wpf.forms
         }
 
 
-        public Form AutoSuggestFor(string fieldName, Func<string, IEnumerable<string>> itemsGenerator)
+        public Form AutoSuggestFor(string fieldName, Func<string, IEnumerable<string>> itemsGenerator,
+            Action<T> onSelected = null)
         {
             this.Model[fieldName] = "";
             string autoSuggestSourceFieldName = AutoSuggestSourceName(fieldName);
@@ -122,6 +123,17 @@ namespace nac.wpf.forms
             Helper_BindField(autoSuggestSourceFieldName, tb, AutoCompleteBox.ItemsSourceProperty);
 
             Helper_BindField(busyFieldName, busyIndicator, nac.wpf.controls.BusyControl.BusyIndicatorControl.BusyProperty, BindingMode.TwoWay);
+
+            if (onSelected != null)
+            {
+                tb.SelectionChanged += (_sender, _args) =>
+                {
+                    if (tb.SelectedItem is T item && item != null)
+                    {
+                        onSelected(item);
+                    }
+                };
+            }
 
             DockPanel halfRow = new DockPanel();
             DockPanel.SetDock(busyIndicator, Dock.Left);

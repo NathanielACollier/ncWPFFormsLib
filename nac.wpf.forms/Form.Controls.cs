@@ -2,20 +2,62 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace nac.wpf.forms
 {
     public partial class Form
     {
-        public Form TextBoxFor(string fieldName, string value = "")
+        public Form TextBoxFor(string fieldName, string value = "",
+            Action<KeyEventArgs> onKeyUp = null,
+            bool showFieldNameOnRow = true,
+            bool multiline = false)
         {
             this.Model[fieldName] = value;
 
             TextBox tb = new TextBox();
 
+            tb.KeyUp += (_s, _args) =>
+            {
+                if (onKeyUp != null)
+                {
+                    onKeyUp(_args);
+                }
+            };
+
             Helper_BindField(fieldName, tb, TextBox.TextProperty, BindingMode.TwoWay);
 
-            this.Helper_AddRowToHost(tb, fieldName);
+            if (multiline)
+            {
+                var sv = new ScrollViewer();
+                sv.Content = tb;
+
+                tb.TextWrapping = TextWrapping.Wrap;
+                tb.AcceptsReturn = true;
+                tb.AcceptsTab = true;
+                tb.SpellCheck.IsEnabled = true;
+
+                if (showFieldNameOnRow)
+                {
+                    this.Helper_AddRowToHost(sv, rowLabel: fieldName, rowAutoHeight: false);
+                }
+                else
+                {
+                    this.Helper_AddRowToHost(sv, rowAutoHeight: false);
+                }
+
+            }
+            else
+            {
+                if (showFieldNameOnRow)
+                {
+                    this.Helper_AddRowToHost(tb, fieldName);
+                }
+                else
+                {
+                    this.Helper_AddRowToHost(tb);
+                }
+            }
 
             return this;
         }
@@ -62,21 +104,25 @@ namespace nac.wpf.forms
         }
 
 
-        public Form DateFor(string fieldName)
+        public Form DateFor(string fieldName, DateTime? initialDate = null)
         {
             this.Model[fieldName] = new DateTime?(); // just init a date in there
 
-            DatePicker dp = new DatePicker();
+            if (initialDate.HasValue)
+            {
+                this.Model[fieldName] = initialDate.Value;
+            }
 
+            DatePicker dp = new DatePicker();
             Helper_BindField(fieldName, dp, DatePicker.SelectedDateProperty, BindingMode.TwoWay);
 
             this.Helper_AddRowToHost(dp, fieldName);
 
             return this;
         }
-        
-        
-        
+
+
+
         public Form ButtonsTrueFalseFor(string fieldName)
         {
             this.Model[fieldName] = false;
@@ -127,10 +173,67 @@ namespace nac.wpf.forms
 
             return this;
         }
-        
-        
-        
-        
-        
+
+
+
+        public Form TextFor(string fieldName)
+        {
+            var lbl = new Label();
+
+            Helper_BindField(fieldName, lbl, Label.ContentProperty);
+
+            Helper_AddRowToHost(lbl);
+            return this;
+        }
+
+
+
+        public Form CheckBoxFor(string fieldName, Action<object> checkChangedAction = null)
+        {
+            var cb = new CheckBox();
+
+            if (checkChangedAction != null)
+            {
+                Helper_setupControlCommand(cb, CheckBox.CommandProperty, checkChangedAction, commandParameterProperty: CheckBox.CommandParameterProperty);
+            }
+
+            Helper_BindField(fieldName, cb, CheckBox.IsCheckedProperty, BindingMode.TwoWay);
+
+            this.Helper_AddRowToHost(cb);
+            return this;
+
+        }
+
+
+        public Form Line()
+        {
+            var seperator = new Separator();
+
+            this.Helper_AddRowToHost(seperator);
+
+            return this;
+        }
+
+
+
+        public Form Image(string fieldName)
+        {
+            var img = new System.Windows.Controls.Image();
+
+            var scrollViewer = new ScrollViewer();
+            scrollViewer.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+            scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+
+            scrollViewer.Content = img;
+
+            Helper_BindField(fieldName, img, System.Windows.Controls.Image.SourceProperty, BindingMode.TwoWay);
+
+            this.Helper_AddRowToHost(scrollViewer, rowAutoHeight: false);
+
+            return this;
+        }
+
+
+
     }
 }

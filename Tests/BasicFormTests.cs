@@ -27,7 +27,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestTextboxWithTwoQuestions()
         {
             var result = new Form()
@@ -40,7 +40,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestSimpleAutoSuggest()
         {
             var result = new Form()
@@ -56,7 +56,7 @@ namespace Tests
 
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void SimpleEmployeeInfoForm()
         {
             var result = new Form()
@@ -77,7 +77,7 @@ namespace Tests
                         );
         }
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestDateForInitialDate()
         {
             var form = new Form()
@@ -87,11 +87,11 @@ namespace Tests
 
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TextBoxWithStartingValue()
         {
             var result = new Form()
-                            .TextBoxFor("Email", value: "nathaniel.collier@aecc.com")
+                            .TextBoxFor("Email", value: "Apple Orchard")
                             .Display();
         }
 
@@ -101,7 +101,7 @@ namespace Tests
             UnitedStates, Argintina, Brazil, Mexico
         }
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestEnumDropDown()
         {
 
@@ -117,7 +117,7 @@ namespace Tests
 
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestTextBoxMultiple()
         {
             var result = new Form()
@@ -131,7 +131,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestAutoSuggest()
         {
             var result = new Form()
@@ -152,7 +152,7 @@ namespace Tests
 
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestAutoSuggestMultiple()
         {
             var result = new Form()
@@ -174,7 +174,7 @@ namespace Tests
             Assert.IsTrue(!string.IsNullOrWhiteSpace(groupList[0]["item_Text"] as string));
         }
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestSimpleTree()
         {
             var result = new Form()
@@ -213,7 +213,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestObjectViewer()
         {
             var stats = new TestObjectViewerStats
@@ -242,7 +242,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestObjectViewerAgainstDictionary()
         {
             var stats = new Dictionary<string, object>
@@ -283,7 +283,7 @@ namespace Tests
 
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestSimpleButton()
         {
             var form = new Form();
@@ -298,7 +298,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestSimpleLabel()
         {
             var form = new Form();
@@ -309,7 +309,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestSelectingFile()
         {
             var form = new Form();
@@ -320,7 +320,7 @@ namespace Tests
             Assert.IsTrue(System.IO.File.Exists(form.Model["testPath"] as string));
         }
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestSelectingFileThatDoesntExist()
         {
             var form = new Form();
@@ -338,7 +338,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestChangeFilenameBasedOnOtherInputs()
         {
             var form = new Form();
@@ -362,7 +362,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestTable()
         {
             var items = new[]
@@ -381,7 +381,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestSelectingFolder()
         {
             var form = new Form();
@@ -398,7 +398,7 @@ namespace Tests
 
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestTrueFalseButtons()
         {
             var form = new Form();
@@ -411,7 +411,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void DisplayTextTest()
         {
             var form = new Form();
@@ -422,7 +422,7 @@ namespace Tests
 
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestBusy()
         {
             var form = new Form();
@@ -445,7 +445,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestMultipleTabs()
         {
             var form = new Form()
@@ -457,7 +457,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void AddTabLater()
         {
             var form = new Form()
@@ -480,7 +480,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestHorizontalGroup()
         {
             var form = new Form()
@@ -490,7 +490,7 @@ namespace Tests
                    ).Display();
         }
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestVerticalSplitGroup()
         {
             var form = new Form()
@@ -502,7 +502,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestHorizontalGroupSplit()
         {
             var form = new Form()
@@ -528,7 +528,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestLogReadyInLogViewer()
         {
             new Form()
@@ -540,7 +540,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestHideShowHorizontalGroup()
         {
             new Form()
@@ -561,7 +561,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestHideShowVeritcalGroup()
         {
             new Form()
@@ -586,7 +586,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestExpandingObjectViewer()
         {
             var data = new Dictionary<string, object>();
@@ -609,7 +609,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestExpandingObjectViewerInsideTab()
         {
             var data = new Dictionary<string, object>();
@@ -639,7 +639,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestLogViewer()
         {
             var form = new Form();
@@ -654,7 +654,7 @@ namespace Tests
 
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestBasicList()
         {
             var form = new Form();
@@ -699,7 +699,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestTextBoxKeyUp()
         {
             var f = new Form();
@@ -713,7 +713,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestListInVerticalGroup()
         {
             var f = new Form();
@@ -743,7 +743,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestListInSplitVerticalGroup()
         {
             var f = new Form();
@@ -773,7 +773,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestAddALine()
         {
             new Form()
@@ -784,7 +784,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestMultilineTextbox()
         {
             var f = new Form();
@@ -800,7 +800,7 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestChangeColorOfButton()
         {
             var f = new Form();
@@ -823,7 +823,7 @@ namespace Tests
 
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestButtonThatClosesWindow()
         {
             var f = new Form();
@@ -956,7 +956,7 @@ namespace Tests
 
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public void TestDisplayImage()
         {
             string imagePath = @"C:\Users\ncollier\Desktop\temp\2020-02-27\output.png";

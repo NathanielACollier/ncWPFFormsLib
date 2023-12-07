@@ -22,7 +22,7 @@ public partial class Form
     {
         this.Model[fieldName] = ""; // init a value
 
-        var filePicker = new nac.wpf.controls.FilePicker();
+        var filePicker = new nac.wpf.Controls.FilePicker();
         filePicker.FileMustExist = fileMustExist;
 
         SetupFilePathFileNameBinding(fieldName, functions, filePicker);
@@ -37,7 +37,7 @@ public partial class Form
             filePicker.FileNameFilter = "All files (*.*)|*.*";
         }
 
-        Helper_BindField(fieldName, filePicker, nac.wpf.controls.FilePicker.FilePathProperty, mode: BindingMode.TwoWay);
+        Helper_BindField(fieldName, filePicker, nac.wpf.Controls.FilePicker.FilePathProperty, mode: BindingMode.TwoWay);
 
         if (onFilePathChanged != null)
         {
@@ -52,11 +52,11 @@ public partial class Form
         return this;
     }
 
-    private void SetupFilePathFileNameBinding(string fieldName, FilePathForFunctions functions, nac.wpf.controls.FilePicker filePicker)
+    private void SetupFilePathFileNameBinding(string fieldName, FilePathForFunctions functions, nac.wpf.Controls.FilePicker filePicker)
     {
         string fileNameFieldName = $"{fieldName}_fileName";
         this.Model[fileNameFieldName] = ""; // init
-        Helper_BindField(fileNameFieldName, filePicker, nac.wpf.controls.FilePicker.FileNameProperty, BindingMode.TwoWay);
+        Helper_BindField(fileNameFieldName, filePicker, nac.wpf.Controls.FilePicker.FileNameProperty, BindingMode.TwoWay);
 
         if (functions != null)
         {
@@ -79,8 +79,8 @@ public partial class Form
     {
         this.Model[fieldName] = ""; // init
 
-        var dirPicker = new nac.wpf.controls.DirectoryPicker();
-        Helper_BindField(fieldName, dirPicker, nac.wpf.controls.DirectoryPicker.DirectoryPathProperty, mode: BindingMode.TwoWay);
+        var dirPicker = new nac.wpf.Controls.DirectoryPicker();
+        Helper_BindField(fieldName, dirPicker, nac.wpf.Controls.DirectoryPicker.DirectoryPathProperty, mode: BindingMode.TwoWay);
 
         this.Helper_AddRowToHost(dirPicker, fieldName);
 

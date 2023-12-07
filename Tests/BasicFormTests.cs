@@ -904,12 +904,15 @@ namespace Tests
             Form.StartUI(f =>
             {
                 f.Model["logTabError"] = false;
-                Log4NetHelpers.CodeConfiguredUtilities.AddNotifyAppender((_s, _args) => {
-                    if (_args.SourceEvent.Level > log4net.Core.Level.Info)
+                // watch for anything that is an error and change model
+                nac.Logging.Logger.OnNewMessage += (_s, _e) =>
+                {
+                    bool isInfo = new[] { "info", "debug" }.Contains(_e.Level.ToLower());
+                    if (!isInfo)
                     {
                         f.Model["logTabError"] = true;
                     }
-                });
+                };
 
 
                 f.AddTab(t =>
@@ -958,7 +961,7 @@ namespace Tests
         {
             string imagePath = @"C:\Users\ncollier\Desktop\temp\2020-02-27\output.png";
 
-            var img = System.ConvertNCWPF.ToWPFBitmapImage(System.IO.File.ReadAllBytes(imagePath));
+            var img = nac.wpf.utilities.Convert.ToWPFBitmapImage(System.IO.File.ReadAllBytes(imagePath));
 
             Form.StartUI(f =>
             {

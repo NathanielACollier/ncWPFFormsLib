@@ -519,9 +519,9 @@ namespace Tests
              + This test doesn't have the WPF attribute, because it's testing making the WPF thread setup stuff
          */
         [TestMethod]
-        public void TestStartUI()
+        public async Task TestStartUI()
         {
-            Form.StartUI(f =>
+            await Form.StartUI(f =>
 
                 f.Text("Hello World!")
             );
@@ -836,10 +836,10 @@ namespace Tests
 
 
         [TestMethod]
-        public void TestDifferentThreadUIDispatcherShortcut()
+        public async Task TestDifferentThreadUIDispatcherShortcut()
         {
             // test access wpf outside the UI Thread
-            Form.StartUI(f =>
+            await Form.StartUI(f =>
             {
                 f.TextBoxFor("test");
 
@@ -857,9 +857,9 @@ namespace Tests
 
 
         [TestMethod]
-        public void TestFormClosingEvent()
+        public async Task TestFormClosingEvent()
         {
-            Form.StartUI(f =>
+            await Form.StartUI(f =>
             {
                 f.Text("Close me to get a debug message");
             }, onClosing: (f) =>
@@ -872,10 +872,10 @@ namespace Tests
 
 
         [TestMethod]
-        public void TestUpdateUIOnDifferentThread()
+        public async Task TestUpdateUIOnDifferentThread()
         {
             bool isRequestingTime = true;
-            Form.StartUI(f =>
+            await Form.StartUI(f =>
             {
                 // start thread to keep date/time updated
                 Task.Run(async () =>
@@ -898,10 +898,10 @@ namespace Tests
 
 
         [TestMethod]
-        public void TestVisualIndicatorThatErroHasOccuredOnTab()
+        public async Task TestVisualIndicatorThatErroHasOccuredOnTab()
         {
 
-            Form.StartUI(f =>
+            await Form.StartUI(f =>
             {
                 f.Model["logTabError"] = false;
                 // watch for anything that is an error and change model
@@ -956,14 +956,14 @@ namespace Tests
 
 
 
-        [TestMethodWPF]
-        public void TestDisplayImage()
+        [TestMethod]
+        public async Task TestDisplayImage()
         {
             string imagePath = @"C:\Users\ncollier\Desktop\temp\2020-02-27\output.png";
 
             var img = nac.wpf.utilities.Convert.ToWPFBitmapImage(System.IO.File.ReadAllBytes(imagePath));
 
-            Form.StartUI(f =>
+            await Form.StartUI(f =>
             {
                 f.Model["imgToDisplay"] = img;
 

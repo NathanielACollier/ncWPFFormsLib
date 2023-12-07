@@ -75,11 +75,18 @@ namespace nac.wpf.forms
         }
 
 
-        public Form ButtonWithLabel(string labelText, RoutedEventHandler onClick)
+        public Form ButtonWithLabel(string labelText, RoutedEventHandler onClick,
+            Action<Button> onControlReady = null)
         {
             Button btn = new Button();
             btn.Content = labelText;
             btn.Click += onClick;
+
+            if (onControlReady != null)
+            {
+                onControlReady(btn);
+            }
+
             this.Helper_AddRowToHost(btn, "");
             return this;
         }

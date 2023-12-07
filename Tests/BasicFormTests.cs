@@ -2,27 +2,28 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using nac.wpf.forms;
+using Tests.lib;
 
 namespace Tests
 {
     [TestClass]
     public class BasicFormTests
     {
-        [TestMethod]
+        private static nac.Logging.Logger log = new();
+
+        [TestMethodWPF]
         public async Task TestTextBox()
         {
-            await lib.utility.ShowForm(f =>
-            {
-                // idea is to target API like this: http://mscodingblog.blogspot.com/2015/02/introducing-powerforms-for-creating.html
-                f.TextBoxFor("Field1");
-            }, model =>
-            {
-                Assert.IsTrue(!string.IsNullOrEmpty(model["Field1"] as string));
-            });
+            // idea is to target API like this: http://mscodingblog.blogspot.com/2015/02/introducing-powerforms-for-creating.html
+            var result = new Form()
+                .TextBoxFor("Field1")
+                .Display();
 
+            Assert.IsTrue(!string.IsNullOrEmpty( result.Model["Field1"] as string));
         }
 
 
@@ -43,7 +44,7 @@ namespace Tests
         public void TestSimpleAutoSuggest()
         {
             var result = new Form()
-                            .AutoSuggestFor("Val1", (textEntered) =>
+                            .AutoSuggestFor<string>("Val1", (textEntered) =>
                             {
                                 var source = new[] { "Apple", "Ape", "Alexander", "Andrew", "Animal", "Orange", "Pair", "Water Melon", "Cantilope" };
 
@@ -134,7 +135,7 @@ namespace Tests
         public void TestAutoSuggest()
         {
             var result = new Form()
-                .AutoSuggestFor("Group Name", (textEntered) =>
+                .AutoSuggestFor<string>("Group Name", (textEntered) =>
                 {
                     List<string> groups = new List<string>();
 
@@ -329,7 +330,6 @@ namespace Tests
                 {
                     log.Info($"New filepath: {newPath}");
                 })
-                .LogViewer()
                 .Display();
 
             string path = form.Model["testPath"] as string;
@@ -345,7 +345,7 @@ namespace Tests
 
             var testPathFunctions = new Form.FilePathForFunctions();
 
-            form.AutoSuggestFor("fruit", (text) =>
+            form.AutoSuggestFor<string>("fruit", (text) =>
             {
                 return new[] { "orange", "apple", "watermellon" }
                         .Where(i => i.Contains(text));
@@ -358,7 +358,6 @@ namespace Tests
             {
                 log.Info($"New FilePath: {newPath}");
             })
-            .LogViewer()
             .Display();
         }
 
@@ -449,7 +448,7 @@ namespace Tests
         [TestMethod]
         public void TestMultipleTabs()
         {
-            var form = new NacFormsWPFLib.Form()
+            var form = new Form()
                 .AddTab((newF) => newF.TextBoxFor("tb1", "Hello World!"))
                 .AddTab((newF) =>
                     newF.DateFor("Christmass", new DateTime(DateTime.Now.Year, 12, 31))
@@ -461,7 +460,7 @@ namespace Tests
         [TestMethod]
         public void AddTabLater()
         {
-            var form = new NacFormsWPFLib.Form()
+            var form = new Form()
                 .AddTab((f) => f.Text("Hello World!.  The label below should have it's value shared with last tab...")
                 .LabelFor("var1") // make sure the model is shared accross tabs
                 ,
@@ -484,17 +483,17 @@ namespace Tests
         [TestMethod]
         public void TestHorizontalGroup()
         {
-            var form = new NacFormsWPFLib.Form()
-                .HorizontalGroup(f => f.ButtonWithLabel("1", (_o) => { })
-                    .ButtonWithLabel("2", (_o) => { })
-                    .ButtonWithLabel("3", (_o) => { })
+            var form = new Form()
+                .HorizontalGroup(f => f.ButtonWithLabel("1", (_s,_o) => { })
+                    .ButtonWithLabel("2", (_s,_o) => { })
+                    .ButtonWithLabel("3", (_s,_o) => { })
                    ).Display();
         }
 
         [TestMethod]
         public void TestVerticalSplitGroup()
         {
-            var form = new NacFormsWPFLib.Form()
+            var form = new Form()
                 .VerticalGroupSplit(f =>
 
                     f.Text("Entry 1")
@@ -506,7 +505,7 @@ namespace Tests
         [TestMethod]
         public void TestHorizontalGroupSplit()
         {
-            var form = new NacFormsWPFLib.Form()
+            var form = new Form()
                 .HorizontalGroupSplit(f =>
 
                 f.Text("Hello")
@@ -515,10 +514,14 @@ namespace Tests
         }
 
 
+        /*
+         !!NOTE!!
+             + This test doesn't have the WPF attribute, because it's testing making the WPF thread setup stuff
+         */
         [TestMethod]
         public void TestStartUI()
         {
-            NacFormsWPFLib.Form.StartUI(f =>
+            Form.StartUI(f =>
 
                 f.Text("Hello World!")
             );
@@ -528,7 +531,7 @@ namespace Tests
         [TestMethod]
         public void TestLogReadyInLogViewer()
         {
-            new NacFormsWPFLib.Form()
+            new Form()
                 .LogViewer(onLogReady: () =>
                 {
                     log.Info("Hello World! -- Successfull test of log is ready!");
@@ -540,13 +543,13 @@ namespace Tests
         [TestMethod]
         public void TestHideShowHorizontalGroup()
         {
-            new NacFormsWPFLib.Form()
+            new Form()
                 .HorizontalGroup(f =>
-                    f.ButtonWithLabel("Hide", (_o) =>
+                    f.ButtonWithLabel("Hide", (_s,_o) =>
                     {
                         f.Model["row2IsVis"] = false;
                     })
-                    .ButtonWithLabel("Show", (_o) =>
+                    .ButtonWithLabel("Show", (_s,_o) =>
                     {
                         f.Model["row2IsVis"] = true;
                     })
@@ -561,13 +564,13 @@ namespace Tests
         [TestMethod]
         public void TestHideShowVeritcalGroup()
         {
-            new NacFormsWPFLib.Form()
+            new Form()
                 .HorizontalGroup(f =>
-                    f.ButtonWithLabel("Hide", (_o) =>
+                    f.ButtonWithLabel("Hide", (_s, _o) =>
                     {
                         f.Model["row2IsVis"] = false;
                     })
-                    .ButtonWithLabel("Show", (_o) =>
+                    .ButtonWithLabel("Show", (_s, _o) =>
                     {
                         f.Model["row2IsVis"] = true;
                     })
@@ -589,10 +592,10 @@ namespace Tests
             var data = new Dictionary<string, object>();
             var rand = new Random();
 
-            var objFuncs = new NacFormsWPFLib.Form.ObjectViewerFunctions<Dictionary<string, object>>();
+            var objFuncs = new Form.ObjectViewerFunctions<Dictionary<string, object>>();
 
-            new NacFormsWPFLib.Form()
-                .ButtonWithLabel("Add Entry", (_o) =>
+            new Form()
+                .ButtonWithLabel("Add Entry", (_s,_o) =>
                 {
                     data[$"Item_{rand.Next(0, 10000)}"] = new
                     {
@@ -612,11 +615,11 @@ namespace Tests
             var data = new Dictionary<string, object>();
             var rand = new Random();
 
-            var objFuncs = new NacFormsWPFLib.Form.ObjectViewerFunctions<Dictionary<string, object>>();
+            var objFuncs = new Form.ObjectViewerFunctions<Dictionary<string, object>>();
 
-            new NacFormsWPFLib.Form()
+            new Form()
                 .AddTab(f =>
-                    f.ButtonWithLabel("Add Entry", (_o) =>
+                    f.ButtonWithLabel("Add Entry", (_s,_o) =>
                     {
                         data[$"Item_{rand.Next(0, 10000)}"] = new
                         {
@@ -639,9 +642,9 @@ namespace Tests
         [TestMethod]
         public void TestLogViewer()
         {
-            var form = new NacFormsWPFLib.Form();
+            var form = new Form();
             form.TextBoxFor("message", "Hello World!")
-                .ButtonWithLabel("Log Message", (_o) =>
+                .ButtonWithLabel("Log Message", (_s,_o) =>
                 {
                     log.Info(form.Model["message"] as string);
                 })
@@ -654,13 +657,13 @@ namespace Tests
         [TestMethod]
         public void TestBasicList()
         {
-            var form = new NacFormsWPFLib.Form();
-            var items = new ObservableCollection<NacWPFUtilities.BindableDynamicDictionary>();
+            var form = new Form();
+            var items = new ObservableCollection<nac.utilities.BindableDynamicDictionary>();
             form.Model["list1"] = items;
 
-            var newItemFactory = new Func<NacWPFUtilities.BindableDynamicDictionary>(() =>
+            var newItemFactory = new Func<nac.utilities.BindableDynamicDictionary>(() =>
             {
-                var newItem = new NacWPFUtilities.BindableDynamicDictionary();
+                var newItem = new nac.utilities.BindableDynamicDictionary();
                 newItem["isChecked"] = false;
                 newItem["currentDate"] = "";
                 return newItem;
@@ -668,7 +671,7 @@ namespace Tests
 
             items.Add(newItemFactory());
 
-            form.ButtonWithLabel("Add Item", (_o) =>
+            form.ButtonWithLabel("Add Item", (_s, _o) =>
             {
                 items.Add(newItemFactory());
             })
@@ -683,11 +686,9 @@ namespace Tests
                     form.Model["checkedCount"] = items.Count(i => (bool)i["isChecked"] == true);
                 })
                 .TextFor("currentDate")
-                .ButtonWithLabel("Click Me!", (_o) =>
+                .ButtonWithLabel("Click Me!", (_s, _o) =>
                 {
-                    var model = _o as NacWPFUtilities.BindableDynamicDictionary;
-
-                    model["currentDate"] = DateTime.Now.ToLongTimeString();
+                    f.Model["currentDate"] = DateTime.Now.ToLongTimeString();
                 })
             );
 
@@ -701,7 +702,7 @@ namespace Tests
         [TestMethod]
         public void TestTextBoxKeyUp()
         {
-            var f = new NacFormsWPFLib.Form();
+            var f = new Form();
 
             f.TextBoxFor("t1", onKeyUp: (_args) =>
             {
@@ -715,14 +716,14 @@ namespace Tests
         [TestMethod]
         public void TestListInVerticalGroup()
         {
-            var f = new NacFormsWPFLib.Form();
+            var f = new Form();
 
-            var items = new ObservableCollection<NacWPFUtilities.BindableDynamicDictionary>();
+            var items = new ObservableCollection<nac.utilities.BindableDynamicDictionary>();
             f.Model["list1"] = items;
             var rand = new Random();
             for (int i = 0; i < 1000; ++i)
             {
-                var item = new NacWPFUtilities.BindableDynamicDictionary();
+                var item = new nac.utilities.BindableDynamicDictionary();
                 item["Number"] = rand.Next(0, 10000);
                 items.Add(item);
             }
@@ -745,14 +746,14 @@ namespace Tests
         [TestMethod]
         public void TestListInSplitVerticalGroup()
         {
-            var f = new NacFormsWPFLib.Form();
+            var f = new Form();
 
-            var items = new ObservableCollection<NacWPFUtilities.BindableDynamicDictionary>();
+            var items = new ObservableCollection<nac.utilities.BindableDynamicDictionary>();
             f.Model["list1"] = items;
             var rand = new Random();
             for (int i = 0; i < 1000; ++i)
             {
-                var item = new NacWPFUtilities.BindableDynamicDictionary();
+                var item = new nac.utilities.BindableDynamicDictionary();
                 item["Number"] = rand.Next(0, 10000);
                 items.Add(item);
             }
@@ -775,7 +776,7 @@ namespace Tests
         [TestMethod]
         public void TestAddALine()
         {
-            new NacFormsWPFLib.Form()
+            new Form()
                 .Text("Above Line")
                 .Line()
                 .Text("Below Line")
@@ -786,9 +787,9 @@ namespace Tests
         [TestMethod]
         public void TestMultilineTextbox()
         {
-            var f = new NacFormsWPFLib.Form();
+            var f = new Form();
 
-            f.ButtonWithLabel("Click Me!", (_args) =>
+            f.ButtonWithLabel("Click Me!", (_s, _args) =>
             {
 
             }).TextBoxFor("text",
@@ -802,11 +803,11 @@ namespace Tests
         [TestMethod]
         public void TestChangeColorOfButton()
         {
-            var f = new NacFormsWPFLib.Form();
+            var f = new Form();
             var defaultButtonBackground = new System.Windows.Controls.Button().Background;
             System.Windows.Controls.Button btnRef = null;
 
-            f.ButtonWithLabel("Click Me!", (_args) =>
+            f.ButtonWithLabel("Click Me!", (_s,_args) =>
             {
                 if (btnRef.Background == defaultButtonBackground)
                 {
@@ -825,9 +826,9 @@ namespace Tests
         [TestMethod]
         public void TestButtonThatClosesWindow()
         {
-            var f = new NacFormsWPFLib.Form();
+            var f = new Form();
 
-            f.ButtonWithLabel("Close Me!", (_args) =>
+            f.ButtonWithLabel("Close Me!", (_s,_args) =>
             {
                 f.Close();
             }).Display();
@@ -838,7 +839,7 @@ namespace Tests
         public void TestDifferentThreadUIDispatcherShortcut()
         {
             // test access wpf outside the UI Thread
-            NacFormsWPFLib.Form.StartUI(f =>
+            Form.StartUI(f =>
             {
                 f.TextBoxFor("test");
 
@@ -858,7 +859,7 @@ namespace Tests
         [TestMethod]
         public void TestFormClosingEvent()
         {
-            NacFormsWPFLib.Form.StartUI(f =>
+            Form.StartUI(f =>
             {
                 f.Text("Close me to get a debug message");
             }, onClosing: (f) =>
@@ -874,7 +875,7 @@ namespace Tests
         public void TestUpdateUIOnDifferentThread()
         {
             bool isRequestingTime = true;
-            NacFormsWPFLib.Form.StartUI(f =>
+            Form.StartUI(f =>
             {
                 // start thread to keep date/time updated
                 Task.Run(async () =>
@@ -900,7 +901,7 @@ namespace Tests
         public void TestVisualIndicatorThatErroHasOccuredOnTab()
         {
 
-            NacFormsWPFLib.Form.StartUI(f =>
+            Form.StartUI(f =>
             {
                 f.Model["logTabError"] = false;
                 Log4NetHelpers.CodeConfiguredUtilities.AddNotifyAppender((_s, _args) => {
@@ -916,13 +917,13 @@ namespace Tests
                     t.Text("Press button below to cause a test log message to be written.")
                     .HorizontalGroup(h =>
                     {
-                        h.ButtonWithLabel("Info", (_args) =>
+                        h.ButtonWithLabel("Info", (_s, _args) =>
                         {
                             log.Info("A normal log message");
-                        }).ButtonWithLabel("Warn", (_args) =>
+                        }).ButtonWithLabel("Warn", (_s, _args) =>
                         {
                             log.Warn("A messing that is a warning");
-                        }).ButtonWithLabel("Error", (_args) =>
+                        }).ButtonWithLabel("Error", (_s, _args) =>
                         {
                             log.Error("An error message");
                         });
@@ -941,7 +942,7 @@ namespace Tests
                     .HorizontalGroup(hori => {
                         hori.Text("!!!--ERROR--!!!");
                     }, isVisiblePropertyName: "logTabError")
-                    .ButtonWithLabel("Test", (_args) =>
+                    .ButtonWithLabel("Test", (_s, _args) =>
                     {
                         log.Info("Header button clicked");
                     });
@@ -959,7 +960,7 @@ namespace Tests
 
             var img = System.ConvertNCWPF.ToWPFBitmapImage(System.IO.File.ReadAllBytes(imagePath));
 
-            NacFormsWPFLib.Form.StartUI(f =>
+            Form.StartUI(f =>
             {
                 f.Model["imgToDisplay"] = img;
 

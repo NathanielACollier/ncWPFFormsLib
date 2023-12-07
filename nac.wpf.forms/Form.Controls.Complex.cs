@@ -150,4 +150,20 @@ public partial class Form
         Helper_AddRowToHost(listScroller, rowAutoHeight: false);
         return this;
     }
+
+
+
+    public Form LogViewer(Action onLogReady = null)
+    {
+        var logEntries = new ObservableCollection<nac.Logging.model.LogMessage>();
+
+        nac.Logging.Logger.OnNewMessage += (_s, _e) =>
+        {
+            logEntries.Add(_e);
+        };
+
+        onLogReady();
+
+        return Table(logEntries);
+    }
 }

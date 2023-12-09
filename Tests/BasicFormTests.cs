@@ -384,6 +384,50 @@ namespace Tests
 
 
         [TestMethodWPF]
+        public void TableWithButtonCounters()
+        {
+            var items = new ObservableCollection<nac.utilities.BindableDynamicDictionary>();
+            for(int i = 0; i < 10; ++i)
+            {
+                var item = new nac.utilities.BindableDynamicDictionary();
+                item["count"] = 0;
+                item["index"] = i;
+                items.Add(item);
+            }
+
+            var f = new Form();
+            f.Model["items"] = items;
+
+            f.Table(itemsSourceModelName: "items",
+                columns: new nac.wpf.forms.model.Column[]
+                {
+                    new nac.wpf.forms.model.Column
+                    {
+                        Header="",
+                        template = row =>
+                        {
+                            row.ButtonWithLabel("Increment", (_s, _args) =>
+                            {
+                                row.Model["count"] = Convert.ToInt32(row.Model["count"]) + 1;
+                            });
+                        }
+                    },
+                    new nac.wpf.forms.model.Column
+                    {
+                        Header="Index",
+                        modelBindingPropertyName="index"
+                    },
+                    new nac.wpf.forms.model.Column
+                    {
+                        Header="Count",
+                        modelBindingPropertyName="count"
+                    }
+                })
+                .Display();
+        }
+
+
+        [TestMethodWPF]
         public void TestSelectingFolder()
         {
             var form = new Form();

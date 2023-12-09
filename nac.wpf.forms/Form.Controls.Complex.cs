@@ -119,7 +119,29 @@ public partial class Form
 
         Helper_BindField(itemsSourceModelName, dg, DataGrid.ItemsSourceProperty);
 
-
+        if (columns != null)
+        {
+            foreach (var c in columns)
+            {
+                if (c.template == null)
+                {
+                    var dgCol = new System.Windows.Controls.DataGridTextColumn();
+                    dgCol.Header = c.Header;
+                    dgCol.Binding = new Binding
+                    {
+                        Path = new PropertyPath(path: c.modelBindingPropertyName)
+                    };
+                    dg.Columns.Add(dgCol);
+                }
+                else
+                {
+                    var col = new System.Windows.Controls.DataGridTemplateColumn();
+                    col.Header = c.Header;
+                    col.CellTemplate = Helper_GetDataTemplateFromFormBuilder(c.template);
+                    dg.Columns.Add(col);
+                }
+            }
+        }
 
         Helper_AddRowToHost(dg, rowAutoHeight: false);
         return this;

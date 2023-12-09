@@ -74,15 +74,21 @@ namespace nac.wpf.forms
 
 
         public Form Display(int height = 600, int width = 800,
-                Action<Form> onClosing = null)
+                Action<Form> onClosing = null,
+                Action<Form> onDisplay = null)
         {
             var win = new Window();
-            return Display(win: win, height: height, width: width,
-                        onClosing: onClosing);
+            return Display(win: win, 
+                height: height, 
+                width: width,
+                onClosing: onClosing,
+                onDisplay: onDisplay,
+                windowCallShowDialog: true);
         }
 
         public Form Display(Window win, int height = 600, int width = 800,
                 Action<Form> onClosing = null,
+                Action<Form> onDisplay = null,
                 bool windowCallShowDialog = true)
         {
             this.window = win; // save a ref to what window we are using
@@ -92,10 +98,12 @@ namespace nac.wpf.forms
 
             win.Closing += (_s, _args) =>
             {
-                if (onClosing != null)
-                {
-                    onClosing(this);
-                }
+                onClosing?.Invoke(this);
+            };
+
+            win.Loaded += (_s, _args) =>
+            {
+                onDisplay?.Invoke(this);
             };
 
             // if we are managing the wpf thread ourselves it is helpfull to do the show of the window in that code

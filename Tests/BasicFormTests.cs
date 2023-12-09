@@ -835,87 +835,75 @@ namespace Tests
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public async Task TestDifferentThreadUIDispatcherShortcut()
         {
-            // test access wpf outside the UI Thread
-            await Form.StartUI(f =>
-            {
-                f.TextBoxFor("test");
-
-                Task.Run(() =>
+            new Form().TextBoxFor("test")
+                .Display(onDisplay: (_f) =>
                 {
-                    // different thread;
-                    // This requires extensions on System.Windows.Threading which is in System.Windows.Presentation
-                    f.BeginInvoke(() =>
+                    Task.Run(() =>
                     {
-                        f.Model["test"] = "Hello World!";
+                        // different thread;
+                        // This requires extensions on System.Windows.Threading which is in System.Windows.Presentation
+                        _f.BeginInvoke(() =>
+                        {
+                            _f.Model["test"] = "Hello World!";
+                        });
                     });
                 });
-            });
+
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public async Task TestFormClosingEvent()
         {
-            await Form.StartUI(f =>
-            {
-                f.Text("Close me to get a debug message");
-            }, onClosing: (f) =>
-            {
-                System.Diagnostics.Debug.WriteLine("***************************************");
-                System.Diagnostics.Debug.WriteLine("--           Form Closed             --");
-                System.Diagnostics.Debug.WriteLine("***************************************");
-            });
+            new Form()
+                .Text("Close me to get a debug message")
+                .Display(onClosing: (f) =>
+                {
+                    System.Diagnostics.Debug.WriteLine("***************************************");
+                    System.Diagnostics.Debug.WriteLine("--           Form Closed             --");
+                    System.Diagnostics.Debug.WriteLine("***************************************");
+                });
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public async Task TestUpdateUIOnDifferentThread()
         {
             bool isRequestingTime = true;
-            await Form.StartUI(f =>
-            {
-                // start thread to keep date/time updated
-                Task.Run(async () =>
+
+            new Form()
+                .TextBoxFor("time")
+                .Display(onDisplay: f =>
                 {
-                    while (isRequestingTime)
+                    // start thread to keep date/time updated
+                    Task.Run(async () =>
                     {
-                        await f.BeginInvoke(() =>
+                        while (isRequestingTime)
                         {
-                            f.Model["time"] = DateTime.Now.ToString();
-                        });
-                        Thread.Sleep(200);
-                    }
+                            await f.BeginInvoke(() =>
+                            {
+                                f.Model["time"] = DateTime.Now.ToString();
+                            });
+                            Thread.Sleep(200);
+                        }
+                    });
+                }, onClosing: f =>
+                {
+                    isRequestingTime = false;
                 });
-
-                f.TextBoxFor("time");
-
-
-            }, onClosing: (f) => isRequestingTime = false);
         }
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public async Task TestVisualIndicatorThatErroHasOccuredOnTab()
         {
+            var mainForm = new Form();
 
-            await Form.StartUI(f =>
-            {
-                f.Model["logTabError"] = false;
-                // watch for anything that is an error and change model
-                nac.Logging.Logger.OnNewMessage += (_s, _e) =>
-                {
-                    bool isInfo = new[] { "info", "debug" }.Contains(_e.Level.ToLower());
-                    if (!isInfo)
-                    {
-                        f.Model["logTabError"] = true;
-                    }
-                };
-
-
-                f.AddTab(t =>
+            mainForm
+                .AddTab(t =>
                 {
                     t.Text("Press button below to cause a test log message to be written.")
                     .HorizontalGroup(h =>
@@ -942,33 +930,47 @@ namespace Tests
                 {
                     // populate the header for the Log Tab
                     tabHeader.Text("Log")
-                    .HorizontalGroup(hori => {
+                    .HorizontalGroup(hori =>
+                    {
                         hori.Text("!!!--ERROR--!!!");
                     }, isVisiblePropertyName: "logTabError")
                     .ButtonWithLabel("Test", (_s, _args) =>
                     {
                         log.Info("Header button clicked");
                     });
-                }, OnFocus: () => f.Model["logTabError"] = false);
+                }, OnFocus: () => mainForm.Model["logTabError"] = false)
+                .Display(onDisplay: f =>
+                {
+                    f.Model["logTabError"] = false;
+                    // watch for anything that is an error and change model
+                    nac.Logging.Logger.OnNewMessage += (_s, _e) =>
+                    {
+                        bool isInfo = new[] { "info", "debug" }.Contains(_e.Level.ToLower());
+                        if (!isInfo)
+                        {
+                            f.Model["logTabError"] = true;
+                        }
+                    };
+                });
 
-            });
         }
 
 
 
-        [TestMethod]
+        [TestMethodWPF]
         public async Task TestDisplayImage()
         {
-            string imagePath = @"C:\Users\ncollier\Desktop\temp\2020-02-27\output.png";
+            string imagePath = System.Environment.ExpandEnvironmentVariables(@"%userprofile%\desktop\temp\pictures\winter.png");
 
             var img = nac.wpf.utilities.Convert.ToWPFBitmapImage(System.IO.File.ReadAllBytes(imagePath));
 
-            await Form.StartUI(f =>
-            {
-                f.Model["imgToDisplay"] = img;
+            new Form()
+                .Image("imgToDisplay")
+                .Display(onDisplay: f =>
+                {
+                    f.Model["imgToDisplay"] = img;
+                });
 
-                f.Image("imgToDisplay");
-            });
         }
     }
 }

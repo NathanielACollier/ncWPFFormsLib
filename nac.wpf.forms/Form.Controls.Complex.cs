@@ -112,14 +112,14 @@ public partial class Form
 
 
 
-    public Form Table<T>(IEnumerable<T> items)
+    public Form Table(string itemsSourceModelName,
+        IEnumerable<model.Column> columns = null)
     {
         var dg = new DataGrid();
-        string tableItemsSourceFieldName = $"table_{Guid.NewGuid().ToString("N")}";
 
-        this.Model[tableItemsSourceFieldName] = items;
+        Helper_BindField(itemsSourceModelName, dg, DataGrid.ItemsSourceProperty);
 
-        Helper_BindField(tableItemsSourceFieldName, dg, DataGrid.ItemsSourceProperty);
+
 
         Helper_AddRowToHost(dg, rowAutoHeight: false);
         return this;
@@ -162,8 +162,11 @@ public partial class Form
             logEntries.Add(_e);
         };
 
+        string itemsSourceModelName = "LogEntries_" + Guid.NewGuid().ToString("N"); // make it random incase people do two log viewer
+        this.Model[itemsSourceModelName] = logEntries;
+
         onLogReady();
 
-        return Table(logEntries);
+        return Table(itemsSourceModelName: itemsSourceModelName);
     }
 }

@@ -375,8 +375,10 @@ namespace Tests
                 prop2 = dict["prop2"] as string
             });
 
-            new Form()
-                .Table(items)
+            var f = new Form();
+            f.Model["items"] = items;
+
+                f.Table(itemsSourceModelName: "items")
                 .Display();
         }
 

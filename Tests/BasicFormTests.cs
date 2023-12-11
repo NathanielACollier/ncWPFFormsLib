@@ -406,9 +406,12 @@ namespace Tests
                         Header="",
                         template = row =>
                         {
-                            row.ButtonWithLabel("Increment", (_s, _args) =>
+                            row.ButtonWithLabel("Increment", ( _s, _args) =>
                             {
-                                row.Model["count"] = Convert.ToInt32(row.Model["count"]) + 1;
+                                var btn = _s as System.Windows.FrameworkElement;
+                                var model = btn.DataContext as nac.utilities.BindableDynamicDictionary;
+
+                                model["count"] = Convert.ToInt32(model["count"]) + 1;
                             });
                         }
                     },

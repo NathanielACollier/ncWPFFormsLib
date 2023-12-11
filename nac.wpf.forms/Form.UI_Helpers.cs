@@ -59,21 +59,20 @@ namespace nac.wpf.forms
 
         private DataTemplate Helper_GetDataTemplateFromFormBuilder(Action<Form> formBuilderAction)
         {
-            string dataTemplateXaml = @"
-                <DataTemplate xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""
-                                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
-                ##ControlPlaceholder##
-                </DataTemplate>
-            ";
-
             var f = new Form();
             formBuilderAction(f);
 
-            dataTemplateXaml = dataTemplateXaml.Replace("##ControlPlaceholder##",
-                nac.wpf.utilities.SaveXaml.SaveXamlUtility.SaveXaml(f.Host)
-                );
+            var formXAML = nac.wpf.utilities.SaveXaml.SaveXamlUtility.SaveXaml(f.Host);
+
+            string dataTemplateXaml = $@"
+                <DataTemplate xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""
+                                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
+                {formXAML}
+                </DataTemplate>
+            ";
 
             var template = (DataTemplate)XamlReader.Parse(dataTemplateXaml);
+
             return template;
         }
 

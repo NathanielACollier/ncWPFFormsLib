@@ -150,19 +150,12 @@ public partial class Form
 
     public Form List(string itemSourcePropertyName, Action<Form> populateItemRow)
     {
-        var horizontalGroupForm = new Form(_parentForm: this);
-
-        horizontalGroupForm.HorizontalGroup(f => populateItemRow(f));
-
-        var grid = (horizontalGroupForm.Host.Children[0] as DockPanel).Children[0] as Grid;
-
-        var xaml = nac.wpf.utilities.SaveXaml.SaveXamlUtility.SaveXaml(grid);
-
         var itemsCtrl = new ItemsControl();
         Helper_BindField(itemSourcePropertyName, itemsCtrl, ItemsControl.ItemsSourceProperty);
 
         // setup item template
-        var itemTemplate = Helper_GetDatatemplate($"<DataTemplate>{xaml}</DataTemplate>");
+        var itemTemplate = Helper_GetDataTemplateFromFormBuilder(formBuilderAction: populateItemRow);
+
         itemsCtrl.ItemTemplate = itemTemplate;
 
         // list should be scrollable and ItemsControl doesn't have built in scrollviewer

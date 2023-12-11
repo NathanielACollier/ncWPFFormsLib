@@ -2,25 +2,62 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace nac.wpf.forms
 {
     public partial class Form
     {
-        public Form TextBoxFor(string fieldName, string value = "")
+        public Form TextBoxFor(string fieldName, string value = "",
+            Action<KeyEventArgs> onKeyUp = null,
+            bool showFieldNameOnRow = true,
+            bool multiline = false)
         {
             this.Model[fieldName] = value;
 
             TextBox tb = new TextBox();
-            // bind in code: http://stackoverflow.com/questions/7525185/how-to-set-a-binding-in-code
-            Binding bind = new Binding();
-            bind.Source = this.Model;
-            bind.Path = new PropertyPath(fieldName);
-            bind.Mode = BindingMode.TwoWay;
-            bind.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-            BindingOperations.SetBinding(tb, TextBox.TextProperty, bind);
 
-            this.AddRowToHost(tb, fieldName);
+            tb.KeyUp += (_s, _args) =>
+            {
+                if (onKeyUp != null)
+                {
+                    onKeyUp(_args);
+                }
+            };
+
+            Helper_BindField(fieldName, tb, TextBox.TextProperty, BindingMode.TwoWay);
+
+            if (multiline)
+            {
+                var sv = new ScrollViewer();
+                sv.Content = tb;
+
+                tb.TextWrapping = TextWrapping.Wrap;
+                tb.AcceptsReturn = true;
+                tb.AcceptsTab = true;
+                tb.SpellCheck.IsEnabled = true;
+
+                if (showFieldNameOnRow)
+                {
+                    this.Helper_AddRowToHost(sv, rowLabel: fieldName, rowAutoHeight: false);
+                }
+                else
+                {
+                    this.Helper_AddRowToHost(sv, rowAutoHeight: false);
+                }
+
+            }
+            else
+            {
+                if (showFieldNameOnRow)
+                {
+                    this.Helper_AddRowToHost(tb, fieldName);
+                }
+                else
+                {
+                    this.Helper_AddRowToHost(tb);
+                }
+            }
 
             return this;
         }
@@ -30,25 +67,27 @@ namespace nac.wpf.forms
             this.Model[fieldName] = value;
             Label label = new Label();
 
-            Binding bind = new Binding();
-            bind.Source = this.Model;
-            bind.Path = new PropertyPath(fieldName);
-            bind.Mode = BindingMode.TwoWay;
-            bind.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-            BindingOperations.SetBinding(label, Label.ContentProperty, bind);
+            Helper_BindField(fieldName, label, Label.ContentProperty, BindingMode.TwoWay);
 
-            this.AddRowToHost(label, fieldName);
+            this.Helper_AddRowToHost(label, fieldName);
 
             return this;
         }
 
 
-        public Form ButtonWithLabel(string labelText, RoutedEventHandler onClick)
+        public Form ButtonWithLabel(string labelText, RoutedEventHandler onClick,
+            Action<Button> onControlReady = null)
         {
             Button btn = new Button();
             btn.Content = labelText;
             btn.Click += onClick;
-            this.AddRowToHost(btn, "");
+
+            if (onControlReady != null)
+            {
+                onControlReady(btn);
+            }
+
+            this.Helper_AddRowToHost(btn, "");
             return this;
         }
         
@@ -66,30 +105,31 @@ namespace nac.wpf.forms
                 this.Model[fieldName] = ((PasswordBox)sender).SecurePassword;
             };
 
-            this.AddRowToHost(box, fieldName);
+            this.Helper_AddRowToHost(box, fieldName);
 
             return this;
         }
 
 
-        public Form DateFor(string fieldName)
+        public Form DateFor(string fieldName, DateTime? initialDate = null)
         {
             this.Model[fieldName] = new DateTime?(); // just init a date in there
 
-            DatePicker dp = new DatePicker();
-            Binding bind = new Binding();
-            bind.Source = this.Model;
-            bind.Path = new PropertyPath(fieldName);
-            bind.Mode = BindingMode.TwoWay;
-            BindingOperations.SetBinding(dp, DatePicker.SelectedDateProperty, bind);
+            if (initialDate.HasValue)
+            {
+                this.Model[fieldName] = initialDate.Value;
+            }
 
-            this.AddRowToHost(dp, fieldName);
+            DatePicker dp = new DatePicker();
+            Helper_BindField(fieldName, dp, DatePicker.SelectedDateProperty, BindingMode.TwoWay);
+
+            this.Helper_AddRowToHost(dp, fieldName);
 
             return this;
         }
-        
-        
-        
+
+
+
         public Form ButtonsTrueFalseFor(string fieldName)
         {
             this.Model[fieldName] = false;
@@ -126,7 +166,7 @@ namespace nac.wpf.forms
             sp.Children.Add(trueButton);
             sp.Children.Add(falseButton);
 
-            AddRowToHost(sp, fieldName);
+            Helper_AddRowToHost(sp, fieldName);
 
             return this;
         }
@@ -136,14 +176,71 @@ namespace nac.wpf.forms
         {
             var lbl = new Label();
             lbl.Content = text;
-            AddRowToHost(lbl);
+            Helper_AddRowToHost(lbl);
 
             return this;
         }
-        
-        
-        
-        
-        
+
+
+
+        public Form TextFor(string fieldName)
+        {
+            var lbl = new Label();
+
+            Helper_BindField(fieldName, lbl, Label.ContentProperty);
+
+            Helper_AddRowToHost(lbl);
+            return this;
+        }
+
+
+
+        public Form CheckBoxFor(string fieldName, Action<object> checkChangedAction = null)
+        {
+            var cb = new CheckBox();
+
+            if (checkChangedAction != null)
+            {
+                Helper_setupControlCommand(cb, CheckBox.CommandProperty, checkChangedAction, commandParameterProperty: CheckBox.CommandParameterProperty);
+            }
+
+            Helper_BindField(fieldName, cb, CheckBox.IsCheckedProperty, BindingMode.TwoWay);
+
+            this.Helper_AddRowToHost(cb);
+            return this;
+
+        }
+
+
+        public Form Line()
+        {
+            var seperator = new Separator();
+
+            this.Helper_AddRowToHost(seperator);
+
+            return this;
+        }
+
+
+
+        public Form Image(string fieldName)
+        {
+            var img = new System.Windows.Controls.Image();
+
+            var scrollViewer = new ScrollViewer();
+            scrollViewer.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+            scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+
+            scrollViewer.Content = img;
+
+            Helper_BindField(fieldName, img, System.Windows.Controls.Image.SourceProperty, BindingMode.TwoWay);
+
+            this.Helper_AddRowToHost(scrollViewer, rowAutoHeight: false);
+
+            return this;
+        }
+
+
+
     }
 }

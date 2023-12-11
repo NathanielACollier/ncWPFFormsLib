@@ -22,9 +22,9 @@ namespace nac.wpf.forms
             return $"{fieldName}_Text";
         }
 
-        private void AddAutoSuggestMultipleItem(ObservableCollection<BindableDynamicDictionary> items)
+        private void AddAutoSuggestMultipleItem(ObservableCollection<nac.utilities.BindableDynamicDictionary> items)
         {
-            var item = new BindableDynamicDictionary();
+            var item = new nac.utilities.BindableDynamicDictionary();
             string fieldName = AutoSuggestMultipleFieldName();
 
             item[AutoSuggestMultipleTextPath(fieldName)] = "";
@@ -36,7 +36,7 @@ namespace nac.wpf.forms
 
         public Form AutoSuggestMultipleFor(string fieldName, Func<string, IEnumerable<string>> itemsGenerator)
         {
-            var items = new ObservableCollection<BindableDynamicDictionary>();
+            var items = new ObservableCollection<nac.utilities.BindableDynamicDictionary>();
             this.Model[fieldName] = items;
 
 
@@ -70,10 +70,7 @@ namespace nac.wpf.forms
             var template = (DataTemplate)XamlReader.Parse(dataTemplateXaml);
             lv.ItemTemplate = template;
 
-            Binding itemSourceBind = new Binding();
-            itemSourceBind.Source = this.Model;
-            itemSourceBind.Path = new PropertyPath(fieldName);
-            BindingOperations.SetBinding(lv, ListView.ItemsSourceProperty, itemSourceBind);
+            Helper_BindField(fieldName, lv, ListView.ItemsSourceProperty);
 
             var buttonClick = new RoutedEventHandler((s, e) =>
             {
@@ -86,7 +83,7 @@ namespace nac.wpf.forms
                 }
                 else if (string.Equals(btn.Name, "RemoveRowButton"))
                 {
-                    var model = btn.DataContext as BindableDynamicDictionary;
+                    var model = btn.DataContext as nac.utilities.BindableDynamicDictionary;
                     if (items.Count > 1)
                     {
                         items.Remove(model);
@@ -100,14 +97,14 @@ namespace nac.wpf.forms
                 if (generator.Status == GeneratorStatus.ContainersGenerated)
                 {
                     // loop through make sure things are setup
-                    foreach (BindableDynamicDictionary model in generator.Items)
+                    foreach (nac.utilities.BindableDynamicDictionary model in generator.Items)
                     {
                         if (!model.GetDynamicMemberNames().Contains("TimerSetup"))
                         {
                             model["TimerSetup"] = true;
                             var visualItem = generator.ContainerFromItem(model) as ListViewItem;
 
-                            AutoCompleteBox box = VisualTree.FindVisualChildren<AutoCompleteBox>(visualItem)
+                            AutoCompleteBox box = nac.wpf.utilities.VisualTree.FindVisualChildren<AutoCompleteBox>(visualItem)
                                                     .Single();
 
                             SetupTimerForAutoComplete(model, AutoSuggestMultipleFieldName(), box, itemsGenerator);
@@ -126,7 +123,7 @@ namespace nac.wpf.forms
             {
                 // there's only one AutoComplete
                 AutoCompleteBox box = e.OriginalSource as AutoCompleteBox;
-                var model = box.DataContext as BindableDynamicDictionary;
+                var model = box.DataContext as nac.utilities.BindableDynamicDictionary;
 
                 // start a timer, or reset a timer to repopulate the drop down
                 var timer = model[TimerName(perItemFieldName)] as System.Windows.Threading.DispatcherTimer;
@@ -139,7 +136,7 @@ namespace nac.wpf.forms
             lv.AddHandler(Button.ClickEvent, buttonClick);
             lv.AddHandler(AutoCompleteBox.TextChangedEvent, autoCompleteTextChanged);
 
-            this.AddRowToHost(lv, fieldName);
+            this.Helper_AddRowToHost(lv, fieldName);
 
             return this;
         }

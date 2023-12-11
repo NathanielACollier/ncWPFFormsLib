@@ -23,19 +23,12 @@ namespace nac.wpf.forms
             ComboBox cb = new ComboBox();
 
             // item source binding
-            Binding itemSourceBind = new Binding();
-            itemSourceBind.Source = this.Model;
-            itemSourceBind.Path = new PropertyPath(itemSourceFieldName);
-            BindingOperations.SetBinding(cb, ComboBox.ItemsSourceProperty, itemSourceBind);
+            Helper_BindField(itemSourceFieldName, cb, ComboBox.ItemsSourceProperty);
 
             // selected item binding
-            Binding itemBind = new Binding();
-            itemBind.Source = this.Model;
-            itemBind.Path = new PropertyPath(fieldName);
-            itemBind.Mode = BindingMode.TwoWay;
-            BindingOperations.SetBinding(cb, ComboBox.SelectedItemProperty, itemBind);
+            Helper_BindField(fieldName, cb, ComboBox.SelectedItemProperty, BindingMode.TwoWay);
 
-            this.AddRowToHost(cb, fieldName);
+            this.Helper_AddRowToHost(cb, fieldName);
 
             return this;
         }
@@ -55,19 +48,12 @@ namespace nac.wpf.forms
             ComboBox cb = new ComboBox();
 
             // item source binding
-            Binding itemSourceBind = new Binding();
-            itemSourceBind.Source = this.Model;
-            itemSourceBind.Path = new PropertyPath(itemSourceName);
-            BindingOperations.SetBinding(cb, ComboBox.ItemsSourceProperty, itemSourceBind);
+            Helper_BindField(itemSourceName, cb, ComboBox.ItemsSourceProperty);
 
             // selected item binding
-            Binding itemBind = new Binding();
-            itemBind.Source = this.Model;
-            itemBind.Path = new PropertyPath(fieldName);
-            itemBind.Mode = BindingMode.TwoWay;
-            BindingOperations.SetBinding(cb, ComboBox.SelectedItemProperty, itemBind);
+            Helper_BindField(fieldName, cb, ComboBox.SelectedItemProperty, BindingMode.TwoWay);
 
-            this.AddRowToHost(cb, fieldName);
+            this.Helper_AddRowToHost(cb, fieldName);
 
             return this;
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -118,6 +119,7 @@ public partial class Form
         var dg = new DataGrid();
 
         Helper_BindField(itemsSourceModelName, dg, DataGrid.ItemsSourceProperty);
+        List<KeyValuePair<string, nac.wpf.utilities.RelayCommand>> commands = new();
 
         if (columns != null)
         {
@@ -135,18 +137,24 @@ public partial class Form
                 }
                 else
                 {
+                    var templateResult = Helper_GetDataTemplateFromFormBuilder(c.template);
+                    commands.AddRange(GetRelayCommands(templateResult.Model));
+
+                    // TODO: something more will have to be done here so that click events can be found to the DataContext of the row in the table
+
                     var col = new System.Windows.Controls.DataGridTemplateColumn();
                     col.Header = c.Header;
-                    col.CellTemplate = Helper_GetDataTemplateFromFormBuilder(c.template);
+                    col.CellTemplate = templateResult.Template;
                     dg.Columns.Add(col);
                 }
             }
         }
 
+        Helper_SetupItemsModelForRelayCommands(itemCollection: dg.Items, relayCommands: commands);
+
         Helper_AddRowToHost(dg, rowAutoHeight: false);
         return this;
     }
-
 
     public Form List(string itemSourcePropertyName, Action<Form> populateItemRow)
     {
@@ -156,7 +164,10 @@ public partial class Form
         // setup item template
         var itemTemplate = Helper_GetDataTemplateFromFormBuilder(formBuilderAction: populateItemRow);
 
-        itemsCtrl.ItemTemplate = itemTemplate;
+        itemsCtrl.ItemTemplate = itemTemplate.Template;
+
+        Helper_SetupItemsModelForRelayCommands(itemCollection: itemsCtrl.Items, 
+                            relayCommands: GetRelayCommands(itemTemplate.Model));
 
         // list should be scrollable and ItemsControl doesn't have built in scrollviewer
         var listScroller = new ScrollViewer();

@@ -4,6 +4,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Windows.Documents;
+using nac.wpf.utilities;
 
 namespace nac.wpf.forms
 {
@@ -56,8 +61,13 @@ namespace nac.wpf.forms
             return (DataTemplate)XamlReader.Parse(fromstring, context);
         }
 
+        private class DataTemplateResult
+        {
+            public DataTemplate Template;
+            public nac.utilities.BindableDynamicDictionary Model;
+        }
 
-        private DataTemplate Helper_GetDataTemplateFromFormBuilder(Action<Form> formBuilderAction)
+        private DataTemplateResult Helper_GetDataTemplateFromFormBuilder(Action<Form> formBuilderAction)
         {
             var f = new Form();
             formBuilderAction(f);
@@ -73,7 +83,11 @@ namespace nac.wpf.forms
 
             var template = (DataTemplate)XamlReader.Parse(dataTemplateXaml);
 
-            return template;
+            return new DataTemplateResult
+            {
+                Template=template,
+                Model=f.Model
+            };
         }
 
 
@@ -234,6 +248,66 @@ namespace nac.wpf.forms
             lvStyle.Setters.Add(horizontalContentAlignmentSetter);
             lv.Style = lvStyle;
         }
+
+
+        private IEnumerable<KeyValuePair<string, nac.wpf.utilities.RelayCommand>> GetRelayCommands(nac.utilities.BindableDynamicDictionary model)
+        {
+            foreach (var key in model.GetDynamicMemberNames())
+            {
+                if (model[key] is nac.wpf.utilities.RelayCommand cmd)
+                {
+                    yield return new KeyValuePair<string, nac.wpf.utilities.RelayCommand>(key: key,
+                        value: cmd);
+                }
+            }
+        }
+
+
+        private void Helper_SetupItemsModelForRelayCommands(ItemCollection itemCollection, 
+                    IEnumerable<KeyValuePair<string, nac.wpf.utilities.RelayCommand>> relayCommands)
+        {
+            // each of the existing items needs the relay commands
+            foreach (var i in itemCollection.OfType<nac.utilities.BindableDynamicDictionary>())
+            {
+                foreach (var cmd in relayCommands)
+                {
+                    i[cmd.Key] = cmd.Value;
+                }
+            }
+
+
+            // each item needs the relay commands
+            ((INotifyCollectionChanged)itemCollection).CollectionChanged += (_s, _args) =>
+            {
+                foreach (var i in _args.NewItems.OfType<nac.utilities.BindableDynamicDictionary>())
+                {
+                    foreach (var cmd in relayCommands)
+                    {
+                        i[cmd.Key] = cmd.Value;
+                    }
+                }
+            };
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     }

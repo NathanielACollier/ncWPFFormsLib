@@ -224,7 +224,7 @@ namespace Tests
 
             var form = new Form()
                         .ObjectViewer(functions: objectViewerFunctions)
-                        .ButtonWithLabel("Hit Me!", (_s, _o) =>
+                        .ButtonWithLabel("Hit Me!", (_o) =>
                         {
                             stats.count++;
                             // update stats
@@ -259,7 +259,7 @@ namespace Tests
 
             var form = new Form()
                         .ObjectViewer(functions: objectViewerFunctions)
-                        .ButtonWithLabel("Hit Me!", (_s, _o) =>
+                        .ButtonWithLabel("Hit Me!", (_o) =>
                         {
                             stats["count"] = (int)stats["count"] + 1;
                             stats["biscuit"] = new
@@ -290,7 +290,7 @@ namespace Tests
             int clickCount = 0;
             form
                 .TextBoxFor("Status")
-                .ButtonWithLabel("Click Me!", (sender, args) =>
+                .ButtonWithLabel("Click Me!", ( args) =>
                 {
                     form.Model["Status"] = $"Clicked {++clickCount} times";
                 })
@@ -406,12 +406,12 @@ namespace Tests
                         Header="",
                         template = row =>
                         {
-                            row.ButtonWithLabel("Increment", ( _s, _args) =>
+                            row.ButtonWithLabel("Increment", ( _args) =>
                             {
-                                var btn = _s as System.Windows.FrameworkElement;
-                                var model = btn.DataContext as nac.utilities.BindableDynamicDictionary;
+                                var model = _args as nac.utilities.BindableDynamicDictionary;
 
                                 model["count"] = Convert.ToInt32(model["count"]) + 1;
+                                
                             });
                         }
                     },
@@ -479,12 +479,12 @@ namespace Tests
 
             form.Busy("Loading..", false, functions: busyActions)
                 .TextBoxFor("output")
-                .ButtonWithLabel("Start", (_s,_o) =>
+                .ButtonWithLabel("Start", (_o) =>
                 {
                     form.Model["output"] = $"Busy is: {busyActions.isBusy()}\nStarting...";
                     busyActions.start();
                 })
-                .ButtonWithLabel("Stop", (_s, _o) =>
+                .ButtonWithLabel("Stop", (_o) =>
                 {
                     form.Model["output"] = $"Busy is: {busyActions.isBusy()}\nStopping...";
                     busyActions.stop();
@@ -533,9 +533,9 @@ namespace Tests
         public void TestHorizontalGroup()
         {
             var form = new Form()
-                .HorizontalGroup(f => f.ButtonWithLabel("1", (_s,_o) => { })
-                    .ButtonWithLabel("2", (_s,_o) => { })
-                    .ButtonWithLabel("3", (_s,_o) => { })
+                .HorizontalGroup(f => f.ButtonWithLabel("1", (_o) => { })
+                    .ButtonWithLabel("2", (_o) => { })
+                    .ButtonWithLabel("3", (_o) => { })
                    ).Display();
         }
 
@@ -594,11 +594,11 @@ namespace Tests
         {
             new Form()
                 .HorizontalGroup(f =>
-                    f.ButtonWithLabel("Hide", (_s,_o) =>
+                    f.ButtonWithLabel("Hide", (_o) =>
                     {
                         f.Model["row2IsVis"] = false;
                     })
-                    .ButtonWithLabel("Show", (_s,_o) =>
+                    .ButtonWithLabel("Show", (_o) =>
                     {
                         f.Model["row2IsVis"] = true;
                     })
@@ -615,11 +615,11 @@ namespace Tests
         {
             new Form()
                 .HorizontalGroup(f =>
-                    f.ButtonWithLabel("Hide", (_s, _o) =>
+                    f.ButtonWithLabel("Hide", (_o) =>
                     {
                         f.Model["row2IsVis"] = false;
                     })
-                    .ButtonWithLabel("Show", (_s, _o) =>
+                    .ButtonWithLabel("Show", (_o) =>
                     {
                         f.Model["row2IsVis"] = true;
                     })
@@ -644,7 +644,7 @@ namespace Tests
             var objFuncs = new Form.ObjectViewerFunctions<Dictionary<string, object>>();
 
             new Form()
-                .ButtonWithLabel("Add Entry", (_s,_o) =>
+                .ButtonWithLabel("Add Entry", (_o) =>
                 {
                     data[$"Item_{rand.Next(0, 10000)}"] = new
                     {
@@ -668,7 +668,7 @@ namespace Tests
 
             new Form()
                 .AddTab(f =>
-                    f.ButtonWithLabel("Add Entry", (_s,_o) =>
+                    f.ButtonWithLabel("Add Entry", (_o) =>
                     {
                         data[$"Item_{rand.Next(0, 10000)}"] = new
                         {
@@ -693,7 +693,7 @@ namespace Tests
         {
             var form = new Form();
             form.TextBoxFor("message", "Hello World!")
-                .ButtonWithLabel("Log Message", (_s,_o) =>
+                .ButtonWithLabel("Log Message", (_o) =>
                 {
                     log.Info(form.Model["message"] as string);
                 })
@@ -720,7 +720,7 @@ namespace Tests
 
             items.Add(newItemFactory());
 
-            form.ButtonWithLabel("Add Item", (_s, _o) =>
+            form.ButtonWithLabel("Add Item", (_o) =>
             {
                 items.Add(newItemFactory());
             })
@@ -732,12 +732,14 @@ namespace Tests
                 f
                 .CheckBoxFor("isChecked", checkChangedAction: (_o) =>
                 {
+                    var model = _o as nac.utilities.BindableDynamicDictionary;
                     form.Model["checkedCount"] = items.Count(i => (bool)i["isChecked"] == true);
                 })
                 .TextFor("currentDate")
-                .ButtonWithLabel("Click Me!", (_s, _o) =>
+                .ButtonWithLabel("Click Me!", (_o) =>
                 {
-                    f.Model["currentDate"] = DateTime.Now.ToLongTimeString();
+                    var model = _o as nac.utilities.BindableDynamicDictionary;
+                    model["currentDate"] = DateTime.Now.ToLongTimeString();
                 })
             );
 
@@ -838,7 +840,7 @@ namespace Tests
         {
             var f = new Form();
 
-            f.ButtonWithLabel("Click Me!", (_s, _args) =>
+            f.ButtonWithLabel("Click Me!", (_args) =>
             {
 
             }).TextBoxFor("text",
@@ -856,7 +858,7 @@ namespace Tests
             var defaultButtonBackground = new System.Windows.Controls.Button().Background;
             System.Windows.Controls.Button btnRef = null;
 
-            f.ButtonWithLabel("Click Me!", (_s,_args) =>
+            f.ButtonWithLabel("Click Me!", (_args) =>
             {
                 if (btnRef.Background == defaultButtonBackground)
                 {
@@ -877,7 +879,7 @@ namespace Tests
         {
             var f = new Form();
 
-            f.ButtonWithLabel("Close Me!", (_s,_args) =>
+            f.ButtonWithLabel("Close Me!", (_args) =>
             {
                 f.Close();
             }).Display();
@@ -957,13 +959,13 @@ namespace Tests
                     t.Text("Press button below to cause a test log message to be written.")
                     .HorizontalGroup(h =>
                     {
-                        h.ButtonWithLabel("Info", (_s, _args) =>
+                        h.ButtonWithLabel("Info", (_args) =>
                         {
                             log.Info("A normal log message");
-                        }).ButtonWithLabel("Warn", (_s, _args) =>
+                        }).ButtonWithLabel("Warn", (_args) =>
                         {
                             log.Warn("A messing that is a warning");
-                        }).ButtonWithLabel("Error", (_s, _args) =>
+                        }).ButtonWithLabel("Error", (_args) =>
                         {
                             log.Error("An error message");
                         });
@@ -983,7 +985,7 @@ namespace Tests
                     {
                         hori.Text("!!!--ERROR--!!!");
                     }, isVisiblePropertyName: "logTabError")
-                    .ButtonWithLabel("Test", (_s, _args) =>
+                    .ButtonWithLabel("Test", (_args) =>
                     {
                         log.Info("Header button clicked");
                     });

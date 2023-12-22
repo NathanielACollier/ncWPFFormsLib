@@ -152,20 +152,6 @@ public partial class Form
         return this;
     }
 
-
-    private IEnumerable<KeyValuePair<string, nac.wpf.utilities.RelayCommand>> GetRelayCommands(nac.utilities.BindableDynamicDictionary model)
-    {
-        foreach(var key in model.GetDynamicMemberNames())
-        {
-            if (model[key] is nac.wpf.utilities.RelayCommand cmd)
-            {
-                yield return new KeyValuePair<string, nac.wpf.utilities.RelayCommand>(key: key,
-                    value: cmd);
-            }
-        }
-    }
-
-
     public Form List(string itemSourcePropertyName, Action<Form> populateItemRow)
     {
         var itemsCtrl = new ItemsControl();
@@ -175,32 +161,8 @@ public partial class Form
         var itemTemplate = Helper_GetDataTemplateFromFormBuilder(formBuilderAction: populateItemRow);
 
         itemsCtrl.ItemTemplate = itemTemplate.Template;
-        var relayCommands = GetRelayCommands(itemTemplate.Model);
 
-        if(this.Model.HasKey(itemSourcePropertyName) && 
-            this.Model[itemSourcePropertyName] is IEnumerable<nac.utilities.BindableDynamicDictionary> list)
-        {
-            // each of the existing items needs the relay commands
-            foreach( var i in list)
-            {
-                foreach( var cmd in relayCommands)
-                {
-                    i[cmd.Key] = cmd.Value;
-                }
-            }
-        }
-
-        // each item needs the relay commands
-        ((INotifyCollectionChanged)itemsCtrl.Items).CollectionChanged += (_s, _args) =>
-        {
-            foreach( var i in _args.NewItems.OfType<nac.utilities.BindableDynamicDictionary>())
-            {
-                foreach( var cmd in relayCommands)
-                {
-                    i[cmd.Key] = cmd.Value;
-                }   
-            }
-        };
+        Helper_SetupItemsModelForRelayCommands(itemCollection: itemsCtrl.Items, dataTemplate: itemTemplate);
 
         // list should be scrollable and ItemsControl doesn't have built in scrollviewer
         var listScroller = new ScrollViewer();

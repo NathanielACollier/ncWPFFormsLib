@@ -5,6 +5,9 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
 using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Windows.Documents;
 
 namespace nac.wpf.forms
 {
@@ -244,6 +247,67 @@ namespace nac.wpf.forms
             lvStyle.Setters.Add(horizontalContentAlignmentSetter);
             lv.Style = lvStyle;
         }
+
+
+        private IEnumerable<KeyValuePair<string, nac.wpf.utilities.RelayCommand>> GetRelayCommands(nac.utilities.BindableDynamicDictionary model)
+        {
+            foreach (var key in model.GetDynamicMemberNames())
+            {
+                if (model[key] is nac.wpf.utilities.RelayCommand cmd)
+                {
+                    yield return new KeyValuePair<string, nac.wpf.utilities.RelayCommand>(key: key,
+                        value: cmd);
+                }
+            }
+        }
+
+
+        private void Helper_SetupItemsModelForRelayCommands(ItemCollection itemCollection, DataTemplateResult dataTemplate)
+        {
+            var relayCommands = GetRelayCommands(dataTemplate.Model);
+
+            // each of the existing items needs the relay commands
+            foreach (var i in itemCollection.OfType<nac.utilities.BindableDynamicDictionary>())
+            {
+                foreach (var cmd in relayCommands)
+                {
+                    i[cmd.Key] = cmd.Value;
+                }
+            }
+
+
+            // each item needs the relay commands
+            ((INotifyCollectionChanged)itemCollection).CollectionChanged += (_s, _args) =>
+            {
+                foreach (var i in _args.NewItems.OfType<nac.utilities.BindableDynamicDictionary>())
+                {
+                    foreach (var cmd in relayCommands)
+                    {
+                        i[cmd.Key] = cmd.Value;
+                    }
+                }
+            };
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     }

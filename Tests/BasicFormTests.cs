@@ -734,12 +734,14 @@ namespace Tests
                 f
                 .CheckBoxFor("isChecked", checkChangedAction: (_o) =>
                 {
+                    var model = _o as nac.utilities.BindableDynamicDictionary;
                     form.Model["checkedCount"] = items.Count(i => (bool)i["isChecked"] == true);
                 })
                 .TextFor("currentDate")
                 .ButtonWithLabel("Click Me!", (_o) =>
                 {
-                    f.Model["currentDate"] = DateTime.Now.ToLongTimeString();
+                    var model = _o as nac.utilities.BindableDynamicDictionary;
+                    model["currentDate"] = DateTime.Now.ToLongTimeString();
                 })
             );
 

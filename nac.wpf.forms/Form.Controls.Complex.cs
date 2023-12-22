@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -135,9 +136,13 @@ public partial class Form
                 }
                 else
                 {
+                    var templateResult = Helper_GetDataTemplateFromFormBuilder(c.template);
+
+                    // TODO: something more will have to be done here so that click events can be found to the DataContext of the row in the table
+
                     var col = new System.Windows.Controls.DataGridTemplateColumn();
                     col.Header = c.Header;
-                    col.CellTemplate = Helper_GetDataTemplateFromFormBuilder(c.template);
+                    col.CellTemplate = templateResult.Template;
                     dg.Columns.Add(col);
                 }
             }
@@ -145,6 +150,19 @@ public partial class Form
 
         Helper_AddRowToHost(dg, rowAutoHeight: false);
         return this;
+    }
+
+
+    private IEnumerable<KeyValuePair<string, nac.wpf.utilities.RelayCommand>> GetRelayCommands(nac.utilities.BindableDynamicDictionary model)
+    {
+        foreach(var key in model.GetDynamicMemberNames())
+        {
+            if (model[key] is nac.wpf.utilities.RelayCommand cmd)
+            {
+                yield return new KeyValuePair<string, nac.wpf.utilities.RelayCommand>(key: key,
+                    value: cmd);
+            }
+        }
     }
 
 
@@ -156,7 +174,33 @@ public partial class Form
         // setup item template
         var itemTemplate = Helper_GetDataTemplateFromFormBuilder(formBuilderAction: populateItemRow);
 
-        itemsCtrl.ItemTemplate = itemTemplate;
+        itemsCtrl.ItemTemplate = itemTemplate.Template;
+        var relayCommands = GetRelayCommands(itemTemplate.Model);
+
+        if(this.Model.HasKey(itemSourcePropertyName) && 
+            this.Model[itemSourcePropertyName] is IEnumerable<nac.utilities.BindableDynamicDictionary> list)
+        {
+            // each of the existing items needs the relay commands
+            foreach( var i in list)
+            {
+                foreach( var cmd in relayCommands)
+                {
+                    i[cmd.Key] = cmd.Value;
+                }
+            }
+        }
+
+        // each item needs the relay commands
+        ((INotifyCollectionChanged)itemsCtrl.Items).CollectionChanged += (_s, _args) =>
+        {
+            foreach( var i in _args.NewItems.OfType<nac.utilities.BindableDynamicDictionary>())
+            {
+                foreach( var cmd in relayCommands)
+                {
+                    i[cmd.Key] = cmd.Value;
+                }   
+            }
+        };
 
         // list should be scrollable and ItemsControl doesn't have built in scrollviewer
         var listScroller = new ScrollViewer();

@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
+using System.Collections;
 
 namespace nac.wpf.forms
 {
@@ -56,8 +57,13 @@ namespace nac.wpf.forms
             return (DataTemplate)XamlReader.Parse(fromstring, context);
         }
 
+        private class DataTemplateResult
+        {
+            public DataTemplate Template;
+            public nac.utilities.BindableDynamicDictionary Model;
+        }
 
-        private DataTemplate Helper_GetDataTemplateFromFormBuilder(Action<Form> formBuilderAction)
+        private DataTemplateResult Helper_GetDataTemplateFromFormBuilder(Action<Form> formBuilderAction)
         {
             var f = new Form();
             formBuilderAction(f);
@@ -73,7 +79,11 @@ namespace nac.wpf.forms
 
             var template = (DataTemplate)XamlReader.Parse(dataTemplateXaml);
 
-            return template;
+            return new DataTemplateResult
+            {
+                Template=template,
+                Model=f.Model
+            };
         }
 
 

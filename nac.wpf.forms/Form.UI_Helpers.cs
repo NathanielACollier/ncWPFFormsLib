@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Windows.Documents;
+using nac.wpf.utilities;
 
 namespace nac.wpf.forms
 {
@@ -262,10 +263,9 @@ namespace nac.wpf.forms
         }
 
 
-        private void Helper_SetupItemsModelForRelayCommands(ItemCollection itemCollection, DataTemplateResult dataTemplate)
+        private void Helper_SetupItemsModelForRelayCommands(ItemCollection itemCollection, 
+                    IEnumerable<KeyValuePair<string, nac.wpf.utilities.RelayCommand>> relayCommands)
         {
-            var relayCommands = GetRelayCommands(dataTemplate.Model);
-
             // each of the existing items needs the relay commands
             foreach (var i in itemCollection.OfType<nac.utilities.BindableDynamicDictionary>())
             {

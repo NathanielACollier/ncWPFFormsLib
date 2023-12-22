@@ -408,12 +408,10 @@ namespace Tests
                         {
                             row.ButtonWithLabel("Increment", ( _args) =>
                             {
-                                /*
-                                 var btn = _s as System.Windows.FrameworkElement;
-                                var model = btn.DataContext as nac.utilities.BindableDynamicDictionary;
+                                var model = _args as nac.utilities.BindableDynamicDictionary;
 
                                 model["count"] = Convert.ToInt32(model["count"]) + 1;
-                                */
+                                
                             });
                         }
                     },

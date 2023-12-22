@@ -119,6 +119,7 @@ public partial class Form
         var dg = new DataGrid();
 
         Helper_BindField(itemsSourceModelName, dg, DataGrid.ItemsSourceProperty);
+        List<KeyValuePair<string, nac.wpf.utilities.RelayCommand>> commands = new();
 
         if (columns != null)
         {
@@ -137,6 +138,7 @@ public partial class Form
                 else
                 {
                     var templateResult = Helper_GetDataTemplateFromFormBuilder(c.template);
+                    commands.AddRange(GetRelayCommands(templateResult.Model));
 
                     // TODO: something more will have to be done here so that click events can be found to the DataContext of the row in the table
 
@@ -147,6 +149,8 @@ public partial class Form
                 }
             }
         }
+
+        Helper_SetupItemsModelForRelayCommands(itemCollection: dg.Items, relayCommands: commands);
 
         Helper_AddRowToHost(dg, rowAutoHeight: false);
         return this;
@@ -162,7 +166,8 @@ public partial class Form
 
         itemsCtrl.ItemTemplate = itemTemplate.Template;
 
-        Helper_SetupItemsModelForRelayCommands(itemCollection: itemsCtrl.Items, dataTemplate: itemTemplate);
+        Helper_SetupItemsModelForRelayCommands(itemCollection: itemsCtrl.Items, 
+                            relayCommands: GetRelayCommands(itemTemplate.Model));
 
         // list should be scrollable and ItemsControl doesn't have built in scrollviewer
         var listScroller = new ScrollViewer();

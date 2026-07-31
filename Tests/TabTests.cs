@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using nac.wpf.forms;
 using Tests.lib;
@@ -8,6 +9,9 @@ namespace Tests;
 [TestClass]
 public class TabTests
 {
+    private static nac.Logging.Logger log = new();
+    
+    
     [TestMethodWPF]
     public void TestMultipleTabs()
     {
@@ -41,4 +45,50 @@ public class TabTests
 
         form.Display();
     }
+
+
+    [TestMethodWPF]
+    public async Task TestVisualIndicatorThatErroHasOccuredOnTab()
+    {
+        var mainForm = new Form();
+
+        mainForm
+            .AddTab(t =>
+            {
+                t.Text("Press button below to cause a test log message to be written.")
+                    .HorizontalGroup(h =>
+                    {
+                        h.ButtonWithLabel("Info", (_args) => { log.Info("A normal log message"); })
+                            .ButtonWithLabel("Warn", (_args) => { log.Warn("A messing that is a warning"); })
+                            .ButtonWithLabel("Error", (_args) => { log.Error("An error message"); });
+                    });
+            }, tabName: "Main")
+            .AddTab(t => { t.LogViewer(onLogReady: () => { log.Info("Logging ready..."); }); }, tabName: "Log",
+                populateHeaderForm: tabHeader =>
+                {
+                    // populate the header for the Log Tab
+                    tabHeader.Text("Log")
+                        .HorizontalGroup(hori => { hori.Text("!!!--ERROR--!!!"); },
+                            isVisiblePropertyName: "logTabError")
+                        .ButtonWithLabel("Test", (_args) => { log.Info("Header button clicked"); });
+                }, OnFocus: () => mainForm.Model["logTabError"] = false)
+            .Display(onDisplay: f =>
+            {
+                f.Model["logTabError"] = false;
+                // watch for anything that is an error and change model
+                nac.Logging.Logger.OnNewMessage += (_s, _e) =>
+                {
+                    bool isInfo = new[] { "info", "debug" }.Contains(_e.Level.ToLower());
+                    if (!isInfo)
+                    {
+                        f.Model["logTabError"] = true;
+                    }
+                };
+            });
+    }
+    
+    
+    
+    
+    
 }

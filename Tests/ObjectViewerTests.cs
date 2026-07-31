@@ -82,4 +82,64 @@ public class ObjectViewerTests
             })
             .Display();
     }
+    
+    
+    
+    
+    [TestMethodWPF]
+    public void TestExpandingObjectViewer()
+    {
+        var data = new Dictionary<string, object>();
+        var rand = new Random();
+
+        var objFuncs = new Form.ObjectViewerFunctions<Dictionary<string, object>>();
+
+        new Form()
+            .ButtonWithLabel("Add Entry", (_o) =>
+            {
+                data[$"Item_{rand.Next(0, 10000)}"] = new
+                {
+                    Prop1 = rand.Next(0, 10000),
+                    Prop2 = rand.Next(0, 10000)
+                };
+                objFuncs.updateValue(data);
+            })
+            .ObjectViewer(functions: objFuncs)
+            .Display();
+    }
+
+
+    [TestMethodWPF]
+    public void TestExpandingObjectViewerInsideTab()
+    {
+        var data = new Dictionary<string, object>();
+        var rand = new Random();
+
+        var objFuncs = new Form.ObjectViewerFunctions<Dictionary<string, object>>();
+
+        new Form()
+            .AddTab(f =>
+                    f.ButtonWithLabel("Add Entry", (_o) =>
+                        {
+                            data[$"Item_{rand.Next(0, 10000)}"] = new
+                            {
+                                Prop1 = rand.Next(0, 10000),
+                                Prop2 = rand.Next(0, 10000)
+                            };
+                            objFuncs.updateValue(data);
+                        })
+                        .ObjectViewer(functions: objFuncs)
+                , tabName: "Main"
+            )
+            .AddTab(f =>
+                    f.LogViewer()
+                , tabName: "Log"
+            )
+            .Display();
+    }
+    
+    
+    
+    
+    
 }

@@ -97,12 +97,12 @@ namespace nac.wpf.forms
         }
 
 
-        public Form AutoSuggestFor<T>(string fieldName, Func<string, IEnumerable<string>> itemsGenerator,
+        public Form AutoSuggestFor<T>(string fieldName, Func<string, IEnumerable<T>> itemsGenerator,
             Action<T> onSelected = null)
         {
             this.Model[fieldName] = "";
             string autoSuggestSourceFieldName = AutoSuggestSourceName(fieldName);
-            this.Model[autoSuggestSourceFieldName] = new ObservableCollection<string>();
+            this.Model[autoSuggestSourceFieldName] = new ObservableCollection<T>();
             string busyFieldName = BusyBindModelName(fieldName);
             this.Model[busyFieldName] = false;
 

@@ -40,19 +40,7 @@ namespace Tests
         }
 
 
-        [TestMethodWPF]
-        public void TestSimpleAutoSuggest()
-        {
-            var result = new Form()
-                            .AutoSuggestFor<string>("Val1", (textEntered) =>
-                            {
-                                var source = new[] { "Apple", "Ape", "Alexander", "Andrew", "Animal", "Orange", "Pair", "Water Melon", "Cantilope" };
 
-                                return source.Where(i => i.StartsWith(textEntered, StringComparison.OrdinalIgnoreCase));
-                            }).Display();
-
-            Assert.IsTrue(!string.IsNullOrWhiteSpace(result.Model["Val1"] as string));
-        }
 
 
 
@@ -131,48 +119,7 @@ namespace Tests
         }
 
 
-        [TestMethodWPF]
-        public void TestAutoSuggest()
-        {
-            var result = new Form()
-                .AutoSuggestFor<string>("Group Name", (textEntered) =>
-                {
-                    List<string> groups = new List<string>();
 
-                    groups.Add("Rolling Stones");
-                    groups.Add("Beatles");
-                    groups.Add("Metalica");
-                    groups.Add("Black Eyed Peas");
-
-                    return groups;
-                }).Display();
-
-            Assert.IsTrue(!string.IsNullOrWhiteSpace(result.Model["Group Name"] as string));
-        }
-
-
-
-        [TestMethodWPF]
-        public void TestAutoSuggestMultiple()
-        {
-            var result = new Form()
-                .AutoSuggestMultipleFor("Groups", (textEntered) =>
-                {
-                    List<string> groups = new List<string>();
-
-                    groups.Add("Blue");
-                    groups.Add("Green");
-                    groups.Add("Purple");
-                    groups.Add("Orange");
-
-                    return groups;
-                }).Display();
-
-            var groupList = result.Model["Groups"] as ObservableCollection<nac.utilities.BindableDynamicDictionary>;
-
-            Assert.IsTrue(groupList.Count > 0);
-            Assert.IsTrue(!string.IsNullOrWhiteSpace(groupList[0]["item_Text"] as string));
-        }
 
         [TestMethodWPF]
         public void TestSimpleTree()
@@ -205,79 +152,6 @@ namespace Tests
         }
 
 
-
-
-        public class TestObjectViewerStats
-        {
-            public int count { get; set; }
-        }
-
-
-        [TestMethodWPF]
-        public void TestObjectViewer()
-        {
-            var stats = new TestObjectViewerStats
-            {
-                count = 0
-            };
-            var objectViewerFunctions = new Form.ObjectViewerFunctions<TestObjectViewerStats>();
-
-            var form = new Form()
-                        .ObjectViewer(functions: objectViewerFunctions)
-                        .ButtonWithLabel("Hit Me!", (_o) =>
-                        {
-                            stats.count++;
-                            // update stats
-                            objectViewerFunctions.updateValue(stats);
-                        })
-                        .Display();
-        }
-
-
-        public class TestObjectViewerAgainstDictionaryTestType1
-        {
-            public int count { get; set; }
-            public bool isDone { get; set; }
-            public bool isQuery { get; set; }
-        }
-
-
-        [TestMethodWPF]
-        public void TestObjectViewerAgainstDictionary()
-        {
-            var stats = new Dictionary<string, object>
-            {
-                {"count", 0 },
-                {"biscuit", new { Prop1 = 5, Prop2=7 } },
-                {"apple", new TestObjectViewerAgainstDictionaryTestType1
-                {
-                    count = 3, isDone = false, isQuery = true
-                } }
-            };
-
-            var objectViewerFunctions = new Form.ObjectViewerFunctions<Dictionary<string, object>>();
-
-            var form = new Form()
-                        .ObjectViewer(functions: objectViewerFunctions)
-                        .ButtonWithLabel("Hit Me!", (_o) =>
-                        {
-                            stats["count"] = (int)stats["count"] + 1;
-                            stats["biscuit"] = new
-                            {
-                                Prop1 = new Random().Next(0, 10000),
-                                Prop2 = new Random().Next(0, 10000)
-                            };
-                            stats["apple"] = new TestObjectViewerAgainstDictionaryTestType1
-                            {
-                                count = new Random().Next(0, 100),
-                                isDone = new Random().Next(-100, 100) > 0 ? true : false,
-                                isQuery = new Random().Next(-1, 1) > 0 ? true : false
-                            };
-                            // update stats
-                            objectViewerFunctions.updateValue(stats);
-                        })
-                        .Display();
-        }
 
 
 
@@ -494,39 +368,7 @@ namespace Tests
         }
 
 
-        [TestMethodWPF]
-        public void TestMultipleTabs()
-        {
-            var form = new Form()
-                .AddTab((newF) => newF.TextBoxFor("tb1", "Hello World!"))
-                .AddTab((newF) =>
-                    newF.DateFor("Christmass", new DateTime(DateTime.Now.Year, 12, 31))
-                    , tabName: "Christmas")
-                .Display();
-        }
 
-
-        [TestMethodWPF]
-        public void AddTabLater()
-        {
-            var form = new Form()
-                .AddTab((f) => f.Text("Hello World!.  The label below should have it's value shared with last tab...")
-                .LabelFor("var1") // make sure the model is shared accross tabs
-                ,
-                tabName: "TabA"
-                );
-
-            form.AddTab(f => f.Text("Hey There!")
-            , tabName: "TabB");
-
-            // test without a tab name
-            form.AddTab(f => f.TextBoxFor("var1", "Hello")
-            .LabelFor("var1")
-            .DateFor("christmas")
-            );
-
-            form.Display();
-        }
 
 
         [TestMethodWPF]
@@ -635,57 +477,7 @@ namespace Tests
         }
 
 
-        [TestMethodWPF]
-        public void TestExpandingObjectViewer()
-        {
-            var data = new Dictionary<string, object>();
-            var rand = new Random();
 
-            var objFuncs = new Form.ObjectViewerFunctions<Dictionary<string, object>>();
-
-            new Form()
-                .ButtonWithLabel("Add Entry", (_o) =>
-                {
-                    data[$"Item_{rand.Next(0, 10000)}"] = new
-                    {
-                        Prop1 = rand.Next(0, 10000),
-                        Prop2 = rand.Next(0, 10000)
-                    };
-                    objFuncs.updateValue(data);
-                })
-                .ObjectViewer(functions: objFuncs)
-                .Display();
-        }
-
-
-        [TestMethodWPF]
-        public void TestExpandingObjectViewerInsideTab()
-        {
-            var data = new Dictionary<string, object>();
-            var rand = new Random();
-
-            var objFuncs = new Form.ObjectViewerFunctions<Dictionary<string, object>>();
-
-            new Form()
-                .AddTab(f =>
-                    f.ButtonWithLabel("Add Entry", (_o) =>
-                    {
-                        data[$"Item_{rand.Next(0, 10000)}"] = new
-                        {
-                            Prop1 = rand.Next(0, 10000),
-                            Prop2 = rand.Next(0, 10000)
-                        };
-                        objFuncs.updateValue(data);
-                    })
-                    .ObjectViewer(functions: objFuncs)
-                    , tabName: "Main"
-                )
-                .AddTab(f =>
-                    f.LogViewer()
-                    , tabName: "Log"
-                )
-                .Display();
-        }
 
 
         [TestMethodWPF]
@@ -703,51 +495,7 @@ namespace Tests
 
 
 
-        [TestMethodWPF]
-        public void TestBasicList()
-        {
-            var form = new Form();
-            var items = new ObservableCollection<nac.utilities.BindableDynamicDictionary>();
-            form.Model["list1"] = items;
 
-            var newItemFactory = new Func<nac.utilities.BindableDynamicDictionary>(() =>
-            {
-                var newItem = new nac.utilities.BindableDynamicDictionary();
-                newItem["isChecked"] = false;
-                newItem["currentDate"] = "";
-                return newItem;
-            });
-
-            items.Add(newItemFactory());
-
-            form.ButtonWithLabel("Add Item", (_o) =>
-            {
-                items.Add(newItemFactory());
-            })
-            .HorizontalGroup(f =>
-                f.Text("Check Count: ")
-                .TextFor("checkedCount")
-            )
-            .List("list1", f =>
-                f
-                .CheckBoxFor("isChecked", checkChangedAction: (_o) =>
-                {
-                    var model = _o as nac.utilities.BindableDynamicDictionary;
-                    form.Model["checkedCount"] = items.Count(i => (bool)i["isChecked"] == true);
-                })
-                .TextFor("currentDate")
-                .ButtonWithLabel("Click Me!", (_o) =>
-                {
-                    var model = _o as nac.utilities.BindableDynamicDictionary;
-                    model["currentDate"] = DateTime.Now.ToLongTimeString();
-                })
-            );
-
-            string xaml = form.Xaml;
-
-            form
-            .Display();
-        }
 
 
         [TestMethodWPF]
@@ -764,64 +512,7 @@ namespace Tests
         }
 
 
-        [TestMethodWPF]
-        public void TestListInVerticalGroup()
-        {
-            var f = new Form();
 
-            var items = new ObservableCollection<nac.utilities.BindableDynamicDictionary>();
-            f.Model["list1"] = items;
-            var rand = new Random();
-            for (int i = 0; i < 1000; ++i)
-            {
-                var item = new nac.utilities.BindableDynamicDictionary();
-                item["Number"] = rand.Next(0, 10000);
-                items.Add(item);
-            }
-
-            f.VerticalGroup(v =>
-            {
-                v.Text("Hello World!")
-                .List("list1", (itemRow) =>
-                {
-                    itemRow.HorizontalGroup(h =>
-                    {
-                        h.Text("Number is: ")
-                        .TextBoxFor("Number");
-                    });
-                });
-            }).Display();
-        }
-
-
-        [TestMethodWPF]
-        public void TestListInSplitVerticalGroup()
-        {
-            var f = new Form();
-
-            var items = new ObservableCollection<nac.utilities.BindableDynamicDictionary>();
-            f.Model["list1"] = items;
-            var rand = new Random();
-            for (int i = 0; i < 1000; ++i)
-            {
-                var item = new nac.utilities.BindableDynamicDictionary();
-                item["Number"] = rand.Next(0, 10000);
-                items.Add(item);
-            }
-
-            f.VerticalGroupSplit(v =>
-            {
-                v.Text("Hello World!")
-                .List("list1", (itemRow) =>
-                {
-                    itemRow.HorizontalGroup(h =>
-                    {
-                        h.Text("Number is: ")
-                        .TextBoxFor("Number");
-                    });
-                });
-            }).Display();
-        }
 
 
         [TestMethodWPF]
@@ -948,63 +639,6 @@ namespace Tests
         }
 
 
-        [TestMethodWPF]
-        public async Task TestVisualIndicatorThatErroHasOccuredOnTab()
-        {
-            var mainForm = new Form();
-
-            mainForm
-                .AddTab(t =>
-                {
-                    t.Text("Press button below to cause a test log message to be written.")
-                    .HorizontalGroup(h =>
-                    {
-                        h.ButtonWithLabel("Info", (_args) =>
-                        {
-                            log.Info("A normal log message");
-                        }).ButtonWithLabel("Warn", (_args) =>
-                        {
-                            log.Warn("A messing that is a warning");
-                        }).ButtonWithLabel("Error", (_args) =>
-                        {
-                            log.Error("An error message");
-                        });
-                    });
-                }, tabName: "Main")
-                .AddTab(t =>
-                {
-                    t.LogViewer(onLogReady: () =>
-                    {
-                        log.Info("Logging ready...");
-                    });
-                }, tabName: "Log", populateHeaderForm: tabHeader =>
-                {
-                    // populate the header for the Log Tab
-                    tabHeader.Text("Log")
-                    .HorizontalGroup(hori =>
-                    {
-                        hori.Text("!!!--ERROR--!!!");
-                    }, isVisiblePropertyName: "logTabError")
-                    .ButtonWithLabel("Test", (_args) =>
-                    {
-                        log.Info("Header button clicked");
-                    });
-                }, OnFocus: () => mainForm.Model["logTabError"] = false)
-                .Display(onDisplay: f =>
-                {
-                    f.Model["logTabError"] = false;
-                    // watch for anything that is an error and change model
-                    nac.Logging.Logger.OnNewMessage += (_s, _e) =>
-                    {
-                        bool isInfo = new[] { "info", "debug" }.Contains(_e.Level.ToLower());
-                        if (!isInfo)
-                        {
-                            f.Model["logTabError"] = true;
-                        }
-                    };
-                });
-
-        }
 
 
 

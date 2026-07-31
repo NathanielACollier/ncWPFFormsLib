@@ -22,19 +22,24 @@ namespace nac.wpf.forms
             return $"{fieldName}_Text";
         }
 
-        private void AddAutoSuggestMultipleItem(ObservableCollection<nac.utilities.BindableDynamicDictionary> items)
+        private string AutoSuggestMultipleSelectedItemPath(string fieldName)
+        {
+            return $"{fieldName}_SelectedItem";
+        }
+
+        private void AddAutoSuggestMultipleItem<T>(ObservableCollection<nac.utilities.BindableDynamicDictionary> items)
         {
             var item = new nac.utilities.BindableDynamicDictionary();
             string fieldName = AutoSuggestMultipleFieldName();
 
             item[AutoSuggestMultipleTextPath(fieldName)] = "";
-            item[AutoSuggestSourceName(fieldName)] = new ObservableCollection<string>();
+            item[AutoSuggestSourceName(fieldName)] = new ObservableCollection<T>();
             item[BusyBindModelName(fieldName)] = false; // populating the item source or not...
 
             items.Add(item);
         }
 
-        public Form AutoSuggestMultipleFor(string fieldName, Func<string, IEnumerable<string>> itemsGenerator)
+        public Form AutoSuggestMultipleFor<T>(string fieldName, Func<string, IEnumerable<T>> itemsGenerator)
         {
             var items = new ObservableCollection<nac.utilities.BindableDynamicDictionary>();
             this.Model[fieldName] = items;
@@ -56,7 +61,7 @@ namespace nac.wpf.forms
                         <Button Name=""AddRowButton"" Content=""Add"" DockPanel.Dock=""Right"" />
                         <Button Name=""RemoveRowButton"" Content=""Remove"" DockPanel.Dock=""Right"" />
                         <busyNS:BusyIndicatorControl DockPanel.Dock=""Right"" Busy=""{Binding Path=##BusyPath##, Mode=TwoWay}"" Width=""20"" Height=""20"" Visibility=""Collapsed"" />
-                        <toolKit:AutoCompleteBox Name=""AutoComplete"" Text=""{Binding Path=##TextPath##, Mode=TwoWay}"" ItemsSource=""{Binding Path=##ItemsPath##}"" DockPanel.Dock=""Left"" />
+                        <toolKit:AutoCompleteBox Name=""AutoComplete"" SelectedItem=""{Binding Path=##SelectedItemPath##, Mode=TwoWay}"" Text=""{Binding Path=##TextPath##, Mode=TwoWay}"" ItemsSource=""{Binding Path=##ItemsPath##}"" DockPanel.Dock=""Left"" />
                     </DockPanel>
                 </DataTemplate>
             ";
@@ -65,12 +70,16 @@ namespace nac.wpf.forms
             dataTemplateXaml = dataTemplateXaml
                         .Replace("##TextPath##", AutoSuggestMultipleTextPath(perItemFieldName))
                         .Replace("##BusyPath##", BusyBindModelName(perItemFieldName))
-                        .Replace("##ItemsPath##", AutoSuggestSourceName(perItemFieldName));
+                        .Replace("##ItemsPath##", AutoSuggestSourceName(perItemFieldName))
+                        .Replace("##SelectedItemPath##", AutoSuggestMultipleSelectedItemPath(perItemFieldName));
 
             var template = (DataTemplate)XamlReader.Parse(dataTemplateXaml);
             lv.ItemTemplate = template;
 
-            Helper_BindField(fieldName, lv, ListView.ItemsSourceProperty);
+            Binding itemSourceBind = new Binding();
+            itemSourceBind.Source = this.Model;
+            itemSourceBind.Path = new PropertyPath(fieldName);
+            BindingOperations.SetBinding(lv, ListView.ItemsSourceProperty, itemSourceBind);
 
             var buttonClick = new RoutedEventHandler((s, e) =>
             {
@@ -79,7 +88,7 @@ namespace nac.wpf.forms
                 if (string.Equals(btn.Name, "AddRowButton"))
                 {
                     // this is the add row button
-                    AddAutoSuggestMultipleItem(items);
+                    AddAutoSuggestMultipleItem<T>(items);
                 }
                 else if (string.Equals(btn.Name, "RemoveRowButton"))
                 {
@@ -116,7 +125,7 @@ namespace nac.wpf.forms
 
 
             // need this to happen after we've setup the collection changed event
-            AddAutoSuggestMultipleItem(items); // need to start off with one item
+            AddAutoSuggestMultipleItem<T>(items); // need to start off with one item
 
 
             var autoCompleteTextChanged = new RoutedEventHandler((s, e) =>

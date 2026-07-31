@@ -25,12 +25,16 @@ namespace nac.wpf.forms
             return $"{fieldName}_autoCompleteTimer";
         }
 
-        private void PopulateAutoComplete(AutoCompleteBox tb,
-                            Func<string, IEnumerable<string>> itemsGenerator,
-                            nac.utilities.BindableDynamicDictionary model,
-                            string itemFieldName)
+        private void PopulateAutoComplete<T>(AutoCompleteBox tb,
+            Func<string, IEnumerable<T>> itemsGenerator,
+            nac.utilities.BindableDynamicDictionary model,
+            string itemFieldName)
         {
-            var source = model[AutoSuggestSourceName(itemFieldName)] as ObservableCollection<string>;
+            var source = model[AutoSuggestSourceName(itemFieldName)] as ObservableCollection<T>;
+            if (source == null)
+            {
+                throw new Exception("Source was null. This means you've defined source in AutoSuggestFor as a different type than observablecollection<T> probably.  Go check!");
+            }
             string busyName = BusyBindModelName(itemFieldName);
 
             model[busyName] = true;
@@ -46,7 +50,7 @@ namespace nac.wpf.forms
                     tb.Dispatcher.Invoke(() =>
                     {
                         source.Clear();
-                        foreach (string i in items)
+                        foreach (T i in items)
                         {
                             source.Add(i);
                         }
@@ -56,7 +60,7 @@ namespace nac.wpf.forms
                 }
                 catch (Exception ex)
                 {
-
+                    log.Error($"Exception producing generated items.  {ex}");
                 }
                 finally
                 {
@@ -71,10 +75,10 @@ namespace nac.wpf.forms
         }
 
 
-        private void SetupTimerForAutoComplete(nac.utilities.BindableDynamicDictionary model,
+        private void SetupTimerForAutoComplete<T>(nac.utilities.BindableDynamicDictionary model,
                                         string fieldName,
                                         AutoCompleteBox tb,
-                                        Func<string, IEnumerable<string>> itemsGenerator)
+                                        Func<string, IEnumerable<T>> itemsGenerator)
         {
             string timerName = TimerName(fieldName);
             var timer = new System.Windows.Threading.DispatcherTimer

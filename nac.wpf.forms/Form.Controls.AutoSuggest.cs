@@ -75,10 +75,10 @@ namespace nac.wpf.forms
         }
 
 
-        private void SetupTimerForAutoComplete(nac.utilities.BindableDynamicDictionary model,
+        private void SetupTimerForAutoComplete<T>(nac.utilities.BindableDynamicDictionary model,
                                         string fieldName,
                                         AutoCompleteBox tb,
-                                        Func<string, IEnumerable<string>> itemsGenerator)
+                                        Func<string, IEnumerable<T>> itemsGenerator)
         {
             string timerName = TimerName(fieldName);
             var timer = new System.Windows.Threading.DispatcherTimer

@@ -64,7 +64,11 @@ namespace nac.wpf.forms
 
         public Form LabelFor(string fieldName, string value = "")
         {
-            this.Model[fieldName] = value;
+            if (string.IsNullOrWhiteSpace(this.Model[fieldName] as string))
+            {
+                this.Model[fieldName] = value;
+            }
+            
             Label label = new Label();
 
             Helper_BindField(fieldName, label, Label.ContentProperty, BindingMode.TwoWay);

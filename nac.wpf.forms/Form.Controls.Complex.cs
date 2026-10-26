@@ -24,7 +24,7 @@ public partial class Form
         string treeViewXaml = @"
             <TreeView xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""
                 xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
-                xmlns:ncUtil=""clr-namespace:NacWPFUtilities;assembly=NacWPFUtilities""
+                xmlns:ncUtil=""clr-namespace:nac.utilities;assembly=nac.utilities""
                 ItemsSource=""{Binding Path=##RootItemsPath##}""
                 >
                 <TreeView.Resources>
@@ -118,7 +118,7 @@ public partial class Form
     {
         var dg = new DataGrid();
 
-        Helper_BindField(itemsSourceModelName, dg, DataGrid.ItemsSourceProperty);
+        Helper_BindModelField(itemsSourceModelName, dg, DataGrid.ItemsSourceProperty);
         List<KeyValuePair<string, nac.wpf.utilities.RelayCommand>> commands = new();
 
         if (columns != null)
@@ -159,7 +159,7 @@ public partial class Form
     public Form List(string itemSourcePropertyName, Action<Form> populateItemRow)
     {
         var itemsCtrl = new ItemsControl();
-        Helper_BindField(itemSourcePropertyName, itemsCtrl, ItemsControl.ItemsSourceProperty);
+        Helper_BindModelField(itemSourcePropertyName, itemsCtrl, ItemsControl.ItemsSourceProperty);
 
         // setup item template
         var itemTemplate = Helper_GetDataTemplateFromFormBuilder(formBuilderAction: populateItemRow);

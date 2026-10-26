@@ -13,7 +13,7 @@ namespace nac.wpf.forms
             bool showFieldNameOnRow = true,
             bool multiline = false)
         {
-            this.Model[fieldName] = value;
+            setModelIfNull(fieldName, value);
 
             TextBox tb = new TextBox();
 
@@ -64,11 +64,8 @@ namespace nac.wpf.forms
 
         public Form LabelFor(string fieldName, string value = "")
         {
-            if (string.IsNullOrWhiteSpace(this.Model[fieldName] as string))
-            {
-                this.Model[fieldName] = value;
-            }
-            
+            setModelIfNull(fieldName, value);
+
             Label label = new Label();
 
             Helper_BindField(fieldName, label, Label.ContentProperty, BindingMode.TwoWay);
@@ -99,7 +96,7 @@ namespace nac.wpf.forms
         
         public Form PasswordFor(string fieldName)
         {
-            this.Model[fieldName] = new System.Security.SecureString();
+            setModelIfNull(fieldName, new System.Security.SecureString());
 
             PasswordBox box = new PasswordBox();
             // It's impossible to bind to PasswordBox so we have to do it this way
@@ -107,7 +104,7 @@ namespace nac.wpf.forms
 
             box.PasswordChanged += (sender, args) =>
             {
-                this.Model[fieldName] = ((PasswordBox)sender).SecurePassword;
+                setModelValue(fieldName, ((PasswordBox)sender).SecurePassword);
             };
 
             this.Helper_AddRowToHost(box, fieldName);
@@ -118,11 +115,13 @@ namespace nac.wpf.forms
 
         public Form DateFor(string fieldName, DateTime? initialDate = null)
         {
-            this.Model[fieldName] = new DateTime?(); // just init a date in there
-
             if (initialDate.HasValue)
             {
-                this.Model[fieldName] = initialDate.Value;
+                setModelIfNull(fieldName, initialDate.Value);
+            }
+            else
+            {
+                setModelIfNull(fieldName, (DateTime?)null);
             }
 
             DatePicker dp = new DatePicker();
@@ -137,7 +136,7 @@ namespace nac.wpf.forms
 
         public Form ButtonsTrueFalseFor(string fieldName)
         {
-            this.Model[fieldName] = false;
+            setModelIfNull(fieldName, false);
             var selectedBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
             var unselectedBrush = (new Button()).Background;
 
@@ -153,7 +152,7 @@ namespace nac.wpf.forms
             falseButton.Content = "False";
             falseButton.Click += (s, e) =>
             {
-                this.Model[fieldName] = false;
+                setModelValue(fieldName, false);
                 falseButton.Background = selectedBrush;
                 trueButton.Background = unselectedBrush;
             };
@@ -162,7 +161,7 @@ namespace nac.wpf.forms
             trueButton.Content = "True";
             trueButton.Click += (s, e) =>
             {
-                this.Model[fieldName] = true;
+                setModelValue(fieldName, true);
                 trueButton.Background = selectedBrush;
                 falseButton.Background = unselectedBrush;
             };

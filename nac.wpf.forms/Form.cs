@@ -18,6 +18,12 @@ namespace nac.wpf.forms
         
         public nac.utilities.BindableDynamicDictionary Model { get; set; }
         private lib.NacFormHostGrid Host { get; set; }
+
+        public object DataContext
+        {
+            get { return this.Model[model.SpecialModelKeys.DataContext]; }
+            set { this.Model[model.SpecialModelKeys.DataContext] = value; }
+        }
         private Window window = null;
         private Dictionary<string, FrameworkElement> controlsIndex;
         private System.Windows.Threading.Dispatcher dispatcher = null;

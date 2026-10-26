@@ -16,16 +16,16 @@ namespace nac.wpf.forms
 
         public Form DropDownFor(string fieldName, IEnumerable<string> dropDownSource)
         {
-            this.Model[fieldName] = "";
+            setModelIfNull(fieldName, "");
             string itemSourceFieldName = DropDownItemSourceName(fieldName);
             this.Model[itemSourceFieldName] = dropDownSource;
 
             ComboBox cb = new ComboBox();
 
-            // item source binding
-            Helper_BindField(itemSourceFieldName, cb, ComboBox.ItemsSourceProperty);
+            // item source binding (framework-owned, lives on Model)
+            Helper_BindModelField(itemSourceFieldName, cb, ComboBox.ItemsSourceProperty);
 
-            // selected item binding
+            // selected item binding (user field, routes through binding source)
             Helper_BindField(fieldName, cb, ComboBox.SelectedItemProperty, BindingMode.TwoWay);
 
             this.Helper_AddRowToHost(cb, fieldName);
@@ -44,13 +44,14 @@ namespace nac.wpf.forms
 
             string itemSourceName = DropDownItemSourceName(fieldName);
             this.Model[itemSourceName] = Enum.GetValues(enumType);
+            setModelIfNull(fieldName, null);
 
             ComboBox cb = new ComboBox();
 
-            // item source binding
-            Helper_BindField(itemSourceName, cb, ComboBox.ItemsSourceProperty);
+            // item source binding (framework-owned, lives on Model)
+            Helper_BindModelField(itemSourceName, cb, ComboBox.ItemsSourceProperty);
 
-            // selected item binding
+            // selected item binding (user field, routes through binding source)
             Helper_BindField(fieldName, cb, ComboBox.SelectedItemProperty, BindingMode.TwoWay);
 
             this.Helper_AddRowToHost(cb, fieldName);

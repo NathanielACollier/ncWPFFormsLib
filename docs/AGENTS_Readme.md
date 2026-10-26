@@ -8,6 +8,10 @@ A fluent builder library for building WPF GUI applications quickly using a model
 
 - **Form**: Main container that manages WPF hosting infrastructure, provides fluent API
 - **Model**: `BindableDynamicDictionary` - Shared observable data context supporting MVVM-style bindings
+- **DataContext**: Optional `INotifyPropertyChanged` object (e.g. a `ViewModelBase`) on the form. When set, field bindings route to the ViewModel's properties instead of the Model dictionary. WPF's binding engine natively honors `INotifyPropertyChanged`, so no extra wiring is needed. Set it via `form.DataContext = myViewModel;`. Falls back to the Model dictionary when no DataContext is present. Framework-owned fields (item sources, busy indicators, commands, visibility triggers) always stay on the Model.
+  - `getModelValue(fieldName)` / `setModelValue(fieldName, value)` / `setModelIfNull(fieldName, value)` - Read/write through the binding source (ViewModel or Model). `setModelIfNull` is used for control init so it never clobbers a pre-set ViewModel value.
+  - `notifyOnModelChange(fieldName, callback)` - Subscribe to changes flowing through the binding source.
+  - Model classes live in `nac.wpf.forms.model`: `SpecialModelKeys`, `DataContextValueResult`, `ModelFieldNamePathInfo`.
 - **Host**: `NacFormHostGrid` - Root Grid that receives all child controls
 - **Nested Forms**: Child containers created via grouping methods, strips children and adds them to parent
 

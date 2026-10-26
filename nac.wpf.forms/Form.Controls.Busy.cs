@@ -24,7 +24,7 @@ public partial class Form
         busyCtrl.Width = 20;
         busyCtrl.Height = 20;
 
-        Helper_BindField(busyFieldName, busyCtrl, nac.wpf.controls.BusyControl.BusyIndicatorControl.BusyProperty, BindingMode.TwoWay);
+        Helper_BindModelField(busyFieldName, busyCtrl, nac.wpf.controls.BusyControl.BusyIndicatorControl.BusyProperty, BindingMode.TwoWay);
 
         var addRowToHostFunctions = new AddRowToHostFunctions();
         Helper_AddRowToHost(busyCtrl, displayText, functions: addRowToHostFunctions);

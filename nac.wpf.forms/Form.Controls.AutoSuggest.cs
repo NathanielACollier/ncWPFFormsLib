@@ -100,7 +100,7 @@ namespace nac.wpf.forms
         public Form AutoSuggestFor<T>(string fieldName, Func<string, IEnumerable<T>> itemsGenerator,
             Action<T> onSelected = null)
         {
-            this.Model[fieldName] = "";
+            setModelIfNull(fieldName, "");
             string autoSuggestSourceFieldName = AutoSuggestSourceName(fieldName);
             this.Model[autoSuggestSourceFieldName] = new ObservableCollection<T>();
             string busyFieldName = BusyBindModelName(fieldName);
@@ -124,9 +124,9 @@ namespace nac.wpf.forms
 
             Helper_BindField(fieldName, tb, AutoCompleteBox.SelectedItemProperty, BindingMode.TwoWay);
 
-            Helper_BindField(autoSuggestSourceFieldName, tb, AutoCompleteBox.ItemsSourceProperty);
+            Helper_BindModelField(autoSuggestSourceFieldName, tb, AutoCompleteBox.ItemsSourceProperty);
 
-            Helper_BindField(busyFieldName, busyIndicator, nac.wpf.controls.BusyControl.BusyIndicatorControl.BusyProperty, BindingMode.TwoWay);
+            Helper_BindModelField(busyFieldName, busyIndicator, nac.wpf.controls.BusyControl.BusyIndicatorControl.BusyProperty, BindingMode.TwoWay);
 
             if (onSelected != null)
             {

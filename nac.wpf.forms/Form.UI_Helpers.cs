@@ -184,9 +184,10 @@ namespace nac.wpf.forms
             where T : FrameworkElement
         {
             // only default to true if it doesn't have a value
-            if (!this.Model.GetDynamicMemberNames().Contains(boolIsVisiblePropertyName))
+            var isVisibleResult = getModelValue(boolIsVisiblePropertyName);
+            if (isVisibleResult.invalid || isVisibleResult.Value == null)
             {
-                this.Model[boolIsVisiblePropertyName] = true; // default value to true
+                setModelValue(boolIsVisiblePropertyName, true); // default value to true
             }
 
             // is visible
@@ -212,10 +213,11 @@ namespace nac.wpf.forms
 
         private Binding createModelPropertyBinding(string fieldName,
             BindingMode mode = BindingMode.Default,
-                        UpdateSourceTrigger trigger = UpdateSourceTrigger.Default)
+                        UpdateSourceTrigger trigger = UpdateSourceTrigger.Default,
+                        object bindingSource = null)
         {
             Binding bind = new Binding();
-            bind.Source = this.Model;
+            bind.Source = bindingSource ?? getBindingSource();
             bind.Path = new PropertyPath(fieldName);
             bind.Mode = mode;
             bind.UpdateSourceTrigger = trigger;
@@ -223,13 +225,33 @@ namespace nac.wpf.forms
         }
 
 
+        /*
+         Binds a user field.  When a DataContext (ViewModel) is set this routes to it,
+         otherwise it falls back to the Model dictionary.  WPF's engine already honors
+         INotifyPropertyChanged so no extra wiring is needed.
+         */
         public void Helper_BindField(string fieldName,
                         DependencyObject control,
                         DependencyProperty controlProperty,
                         BindingMode mode = BindingMode.Default,
                         UpdateSourceTrigger trigger = UpdateSourceTrigger.Default)
         {
-            var bind = createModelPropertyBinding(fieldName, mode, trigger);
+            var bind = createModelPropertyBinding(fieldName, mode, trigger, bindingSource: null);
+            BindingOperations.SetBinding(control, controlProperty, bind);
+        }
+
+
+        /*
+         Forces the binding to the Model dictionary.  Used by internal machinery (item sources,
+         busy indicators, etc.) that is owned by the framework and not part of a user ViewModel.
+         */
+        public void Helper_BindModelField(string fieldName,
+                        DependencyObject control,
+                        DependencyProperty controlProperty,
+                        BindingMode mode = BindingMode.Default,
+                        UpdateSourceTrigger trigger = UpdateSourceTrigger.Default)
+        {
+            var bind = createModelPropertyBinding(fieldName, mode, trigger, bindingSource: this.Model);
             BindingOperations.SetBinding(control, controlProperty, bind);
         }
 

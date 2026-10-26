@@ -16,11 +16,11 @@ public partial class Form
     }
 
 
-    public Form FilePathFor(string fieldName, string fileFilter = null, string initialFileName = null, bool fileMustExist = true,
+        public Form FilePathFor(string fieldName, string fileFilter = null, string initialFileName = null, bool fileMustExist = true,
                 Action<string> onFilePathChanged = null,
                 FilePathForFunctions functions = null)
-    {
-        this.Model[fieldName] = ""; // init a value
+        {
+            setModelIfNull(fieldName, ""); // init a value
 
         var filePicker = new nac.wpf.Controls.FilePicker();
         filePicker.FileMustExist = fileMustExist;
@@ -56,28 +56,29 @@ public partial class Form
     {
         string fileNameFieldName = $"{fieldName}_fileName";
         this.Model[fileNameFieldName] = ""; // init
-        Helper_BindField(fileNameFieldName, filePicker, nac.wpf.Controls.FilePicker.FileNameProperty, BindingMode.TwoWay);
+        Helper_BindModelField(fileNameFieldName, filePicker, nac.wpf.Controls.FilePicker.FileNameProperty, BindingMode.TwoWay);
 
         if (functions != null)
         {
             // provide a function that can update the filename
             functions.updateFileName = (newFileName) =>
             {
-                this.Model[fileNameFieldName] = newFileName;
+                setModelValue(fileNameFieldName, newFileName);
                 // set the filename of the current path if we have a current path
-                string currentPath = this.Model[fieldName] as string;
+                var pathResult = getModelValue(fieldName);
+                string currentPath = pathResult.Value as string;
                 if (!string.IsNullOrWhiteSpace(currentPath))
                 {
                     string currentDirPath = System.IO.Path.GetDirectoryName(currentPath);
-                    this.Model[fieldName] = System.IO.Path.Combine(currentDirPath, newFileName);
+                    setModelValue(fieldName, System.IO.Path.Combine(currentDirPath, newFileName));
                 }
             };
         }
     }
 
-    public Form DirectoryPathFor(string fieldName)
-    {
-        this.Model[fieldName] = ""; // init
+        public Form DirectoryPathFor(string fieldName)
+        {
+            setModelIfNull(fieldName, "");
 
         var dirPicker = new nac.wpf.Controls.DirectoryPicker();
         Helper_BindField(fieldName, dirPicker, nac.wpf.Controls.DirectoryPicker.DirectoryPathProperty, mode: BindingMode.TwoWay);
